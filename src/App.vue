@@ -1,6 +1,6 @@
 <script setup>
 import TopNav from '@/components/TopNav.vue'
-import Footer from '@/components/Footer.vue'
+import Footer from '@/components/FooterComponent.vue'
 </script>
 
 <template>
