@@ -5,7 +5,7 @@ const store = useCounterStore();
 
 setInterval(() => {
   store.increment();
-}, 1200)
+}, 1000)
 
 </script>
 
@@ -13,7 +13,6 @@ setInterval(() => {
   <section id="rent">
     <h1>Раздел находится в разработке</h1>
     <h2>Счетчик: {{store.count}}</h2>
-    <h2>НЕ СЧЕТКИ {{store.count}}</h2>
   </section>
 </template>
 
