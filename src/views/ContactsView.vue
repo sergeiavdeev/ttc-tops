@@ -18,7 +18,6 @@
             src="https://yandex.ru/map-widget/v1/?um=constructor%3A0e01f45cf3af7fb545b0ccef5df1193dd310d9774925f0349421a786fa87854f&amp;source=constructor"
             width="100%"
             height="100%"
-            frameborder="0"
             loading="lazy"
             title="Местоположение на Яндекс карте"
           >
