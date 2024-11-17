@@ -1,0 +1,4 @@
+Sitemap: https://ttc-tops.ru/sitemap.xml
+
+User-agent: *
+Allow: /
