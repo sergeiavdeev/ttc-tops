@@ -5,7 +5,7 @@ const store = useCounterStore();
 
 setInterval(() => {
   store.increment();
-}, 1000)
+}, 1200)
 
 </script>
 
