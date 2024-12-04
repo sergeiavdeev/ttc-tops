@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import ContactLink from '@/components/links/ContactLink.vue'
+</script>
 
 <template>
   <section id="home" class="home">
@@ -12,7 +14,7 @@
       <hr />
       <div class="home__description">
         <div>Аренда столов, индивидуальные тренировки, помощь в подборе инвентаря.</div>
-        <a href="tel:+79258815822" class="link__phone">+7 (925) 881-58-22</a>
+        <ContactLink text="+7 (925) 881-58-22" img="phone" href="tel:+79258815822"/>
       </div>
     </div>
     <div class="container">
@@ -39,7 +41,7 @@
       </div>
       <div class="home__footer">
         Рады Вас видеть ежедневно с 10 до 22 &nbsp;
-        <a href="tel:+79258815822" class="link__phone">+7 (925) 881-58-22</a>
+        <ContactLink text="+7 (925) 881-58-22" img="phone" href="tel:+79258815822"/>
       </div>
     </div>
   </section>
@@ -80,17 +82,13 @@
 }
 
 .home a {
-  color: var(--color-white);
+  filter: brightness(0) saturate(100%) invert(99%) sepia(70%) saturate(353%) hue-rotate(232deg)
+  brightness(115%) contrast(100%);
+  transition: 0.3s all;
 }
 
 .home a:hover {
-  color: var(--color-light);
-}
-
-.home .link__phone::before {
-  filter: brightness(0) saturate(100%) invert(99%) sepia(70%) saturate(353%) hue-rotate(232deg)
-    brightness(115%) contrast(100%);
-  bottom: -3px;
+  filter: brightness(0) saturate(100%) invert(50%) sepia(24%) saturate(6795%) hue-rotate(171deg) brightness(104%) contrast(97%);
 }
 
 .home__content {
@@ -120,18 +118,14 @@
 }
 
 .home__footer a {
-  color: var(--color-dark);
+  filter: brightness(0) saturate(100%) invert(2%) sepia(3%) saturate(7404%) hue-rotate(257deg) brightness(100%) contrast(100%);
 }
 
 .home__footer a:hover {
-  color: var(--color-white);
+  filter: brightness(0) saturate(100%) invert(93%) sepia(7%) saturate(27%) hue-rotate(273deg) brightness(108%) contrast(105%);
 }
 
-.home__footer .link__phone::before {
-  filter: brightness(0) saturate(100%) invert(0%) sepia(3%) saturate(29%) hue-rotate(351deg)
-    brightness(89%) contrast(100%);
-  top: 0;
-}
+
 
 @media (max-width: 880px) {
   .home__content {

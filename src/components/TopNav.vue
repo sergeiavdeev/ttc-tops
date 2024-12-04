@@ -1,20 +1,10 @@
 <script setup>
 import IconLogo from '@/components/icons/IconLogo.vue'
 import { useUserStore } from '@/stores/user.js'
-import { onMounted } from 'vue'
+import AccountLink from '@/components/links/AccountLink.vue'
 
-const store = useUserStore();
+const user = useUserStore();
 
-function auth() {
-  store.isAuthenticated = true
-  store.id = 1
-  store.name = 'Sergey'
-  store.email = '1@1.ru'
-}
-
-onMounted(() => {
-  store.isAuthenticated = false;
-})
 
 </script>
 
@@ -39,7 +29,9 @@ onMounted(() => {
           <RouterLink to="/#contacts">Контакты</RouterLink>
         </li>
       </ul>
-      <a class="link__account" href="#" v-on:click="auth()">{{!store.isAuthenticated ? 'Войти' : store.name}}</a>
+      <AccountLink />
+      <!--<a class="link__account" v-if="!user.isAuthenticated" href="#" v-on:click="user.login()">Войти</a>
+      <a class="link__menu" v-if="user.isAuthenticated" href="#" v-on:click="user.login()">{{user.info.firstName}}</a> -->
     </nav>
   </header>
 </template>
@@ -75,10 +67,12 @@ header {
 .nav a {
   color: var(--color-white);
   font-size: 2.3rem;
+  transition: 0.3s ease-in-out;
 }
 
 .nav a:hover {
-  color: var(--color-light);
+  /*color: var(--color-light);*/
+  filter: brightness(0) saturate(100%) invert(50%) sepia(24%) saturate(6795%) hue-rotate(171deg) brightness(104%) contrast(97%);
 }
 .nav input[type='checkbox'] {
   display: none;

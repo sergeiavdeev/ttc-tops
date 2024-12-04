@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build-tst": "vite build --mode tst",
+    "build-prd": "vite build --mode prd",
     "preview": "vite preview",
+    "preview-tst": "vite preview --mode tst",
+    "preview-prd": "vite preview --mode prd",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },
