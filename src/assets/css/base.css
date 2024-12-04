@@ -152,52 +152,65 @@ a {
 
 
 .link__account {
-    position: relative;
-    padding-right: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .link__account::after {
     content: url('../img/Account.svg');
-    position: absolute;
-    right: 0;
-    top: -5px;
+    padding-left: 5px;
+
 }
 
 
+
+.link__menu {
+    display: flex;
+    align-items: center;
+}
+
+.link__menu::before {
+    content: url('../img/Account.svg');
+    padding-right: 5px;
+}
+
+.link__menu::after {
+    content: url('../img/arrow_drop_down.svg');
+    padding-left: 5px;
+}
+
+.link__menu::before:hover, .link__menu::after:hover {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(24%) saturate(6795%) hue-rotate(171deg) brightness(104%) contrast(97%);
+}
+
 .link__phone {
-    position: relative;
-    padding-left: 30px;
+    display: flex;
+    align-items: center;
 }
 
 .link__phone::before {
     content: url('../img/phone.svg');
-    position: absolute;
-    left: 0;
-    top: 5px;
+    padding-right: 5px;
 }
 
 .link__location {
-    position: relative;
-    padding-left: 30px;
+    display: flex;
+    align-items: center;
 }
 
 .link__location::before {
     content: url('../img/location.svg');
-    position: absolute;
-    left: 0;
-    top: 5px;
+    padding-right: 5px;
 }
 
 .link__mail {
-    position: relative;
-    padding-left: 30px;
+    display: flex;
+    align-items: center;
 }
 
 .link__mail::before {
     content: url('../img/mail.svg');
-    position: absolute;
-    left: 0;
-    top: 5px;
+    padding-right: 5px;
 }
 
 section {

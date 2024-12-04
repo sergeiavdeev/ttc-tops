@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import ContactLink from '@/components/links/ContactLink.vue'
+</script>
 
 <template>
   <section id="contacts">
@@ -6,11 +8,14 @@
       <h2>Контакты</h2>
       <div class="container">
         <div class="contacts__title">
-          <a class="link__location" href="tel:+79258815822"
-            ><b>Адрес: </b>г. Подольск, улица Клемента Готвальда, 6В (второй этаж, помещение 4)</a
-          >
-          <a class="link__phone" href="tel:+79258815822"><b>Телефон: </b>+7 (925) 881-58-22</a>
-          <a class="link__mail" href="mailto:lucky1974@mail.ru"><b>E-mail: </b>lucky1974@mail.ru</a>
+
+          <ContactLink
+            text="г. Подольск, улица Клемента Готвальда, 6В (второй этаж, помещение 4)"
+            img="location"
+            href="#contacts"
+          />
+          <ContactLink text="+7 (925) 881-58-22" img="phone" href="tel:+79258815822" />
+          <ContactLink text="lucky1974@mail.ru" img="mail" href="mailto:lucky1974@mail.ru" />
         </div>
 
         <div class="contacts__map">
@@ -29,8 +34,13 @@
 </template>
 
 <style scoped>
-.contacts a {
-  color: var(--color-dark);
+a {
+  transition: 0.3s all;
+  filter: brightness(0) saturate(100%) invert(2%) sepia(3%) saturate(7404%) hue-rotate(257deg) brightness(100%) contrast(100%);
+}
+
+a:hover {
+  filter: brightness(0) saturate(100%) invert(50%) sepia(24%) saturate(6795%) hue-rotate(171deg) brightness(104%) contrast(97%);
 }
 
 .contacts__title {
