@@ -2,7 +2,7 @@
   <footer>
     <div class="footer">
       <div class="container">
-        <a href="mailto:avdeev-sa@pecom.ru"><b>Avdeev S. A.: </b>avdeev-sa@pecom.ru</a>
+        <a href="mailto:admin@avdeev-sa.ru"><b>Avdeev S. A.: </b>admin@avdeev-sa.ru</a>
       </div>
     </div>
   </footer>

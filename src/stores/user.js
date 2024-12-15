@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
     async getUser() {
       let user = await userInfo.getUserInfo();
       this.info = { ...this.info, ...user }
-      this.isAuthenticated = this.info.uuid == null ? false : true;
+      this.isAuthenticated = this.info.uuid != null;
     },
 
     login() {

@@ -1,10 +1,6 @@
 <script setup>
 import IconLogo from '@/components/icons/IconLogo.vue'
-import { useUserStore } from '@/stores/user.js'
 import AccountLink from '@/components/links/AccountLink.vue'
-
-const user = useUserStore();
-
 
 </script>
 
