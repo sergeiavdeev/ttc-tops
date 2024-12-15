@@ -40,6 +40,7 @@ h2 {
 }
 
 .rent-resource {
+  max-width: 450px;
   display: flex;
   align-items: center;
   flex-direction: column;

@@ -2,12 +2,12 @@
 import { computed, onMounted, ref, useId } from 'vue'
 import storage from '@/api/storage.js'
 import { useUserStore } from '@/stores/user.js'
-const listId = useId();
+//const listId = useId();
 const userInfo = useUserStore()
 const props = defineProps(['resourceId'])
 const workTime = ref([])
 const timeList = ref([])
-const isOrderValid = computed(() => orderTime.value !== "--:--");
+const isOrderValid = computed(() => orderTime.value !== "");
 const durationText = computed(() => getDurationText(Number(duration.value)))
 const maxDuration = computed(() => getMaxDuration(orderTime.value, workTime.value));
 const orderDate = defineModel('orderDate',{ default: new Date().toISOString().split('T')[0] })
@@ -29,10 +29,6 @@ onMounted(() => {
 
 function changeDate() {
   getWorkTime()
-}
-
-function changeTime() {
-  duration.value = 1;
 }
 
 function getDurationText(duration) {
@@ -70,10 +66,24 @@ function getWorkTime() {
   storage.getWorkTime(props.resourceId, orderDate.value)
     .then((res) => {
       if (res.dateWorkTimeList.length > 0) {
-        workTime.value = res.dateWorkTimeList[0].timeIntervals
-        generateTimeList(res.dateWorkTimeList[0].timeIntervals)
+        let intervals = cleanIntervals(res.dateWorkTimeList[0].timeIntervals)
+        workTime.value = intervals;
+        generateTimeList(intervals)
       }
   })
+}
+
+function cleanIntervals(intervals) {
+  let result = [];
+  for (let i = 0; i < intervals.length; i++) {
+    let startTime = getDate(intervals[i].startTime)
+    let endTime = getDate(intervals[i].endTime)
+    let duration = (endTime.getHours() - startTime.getHours()) * 60 + endTime.getMinutes() - endTime.getMinutes()
+    if (duration >= 60) {
+      result.push(intervals[i])
+    }
+  }
+  return result;
 }
 
 function generateTimeList(intervals) {
@@ -104,6 +114,14 @@ function getDate(time) {
   date.setHours(time.split(':')[0])
   date.setMinutes(time.split(':')[1])
   return date
+}
+
+function selectStartTime(time) {
+  if (orderTime.value == time) {
+    orderTime.value = "";
+  } else {
+    orderTime.value = time;
+  }
 }
 
 function keyDown(event) {
@@ -154,23 +172,12 @@ function order() {
     <div class="interval" v-for="interval in workTime" v-bind:key="interval.startTime">
       {{ interval.startTime }} - {{ interval.endTime }}
     </div>
-    <label for="orderTime">
-      Выбрать время
-      <input
-        v-model="orderTime"
-        type="time"
-        id="orderTime"
-        step="1800"
-        min="9-00"
-        max="19-00"
-        v-bind:list="listId"
-        v-on:change="changeTime"
-        v-on:keydown="keyDown"
-      />
-      <datalist v-bind:id="listId">
-        <option v-for="el in timeList" v-bind:key="el" v-bind:value="el" />
-      </datalist>
-    </label>
+    <h3>Выбрать время</h3>
+    <div class="free-time">
+      <div class="free-time-el" v-for="el in timeList" :key="el"
+           v-bind:class="orderTime == el ? 'selected' : ''"
+           v-on:click="selectStartTime(el)">{{el}}</div>
+    </div>
     <label for="hours">Количество часов</label>
     <input
       v-model="duration"
@@ -197,7 +204,7 @@ function order() {
 label {
   font-size: 2rem;
   cursor: default;
-  margin: 0.7rem;
+  margin: 0.5rem;
 }
 
 input[type='date'],
@@ -208,7 +215,40 @@ input[type='time'] {
 
 .interval {
   font-size: 2.2rem;
+  padding: 5px;
+}
+
+.free-time {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
   padding: 10px;
+}
+
+.free-time-el {
+  font-size: 1.5rem;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--color-light);
+  -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+  box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.selected {
+  background-color: var(--color-light);
+}
+
+.free-time-el:hover {
+  border-radius: 2px;
+  border: 1px solid blue;
+  -webkit-box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
+  box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
 }
 
 button {
