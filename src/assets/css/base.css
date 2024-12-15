@@ -135,6 +135,12 @@ h2 {
     text-align: center;
 }
 
+h3 {
+    padding-top: 10px;
+    font-size: 2rem;
+    text-align: center;
+}
+
 a {
     transition: color 0.3s ease-in-out;
 
