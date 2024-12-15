@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, useId } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import storage from '@/api/storage.js'
 import { useUserStore } from '@/stores/user.js'
 //const listId = useId();
@@ -117,7 +117,7 @@ function getDate(time) {
 }
 
 function selectStartTime(time) {
-  if (orderTime.value == time) {
+  if (orderTime.value === time) {
     orderTime.value = "";
   } else {
     orderTime.value = time;
@@ -175,7 +175,7 @@ function order() {
     <h3>Выбрать время</h3>
     <div class="free-time">
       <div class="free-time-el" v-for="el in timeList" :key="el"
-           v-bind:class="orderTime == el ? 'selected' : ''"
+           v-bind:class="orderTime === el ? 'selected' : ''"
            v-on:click="selectStartTime(el)">{{el}}</div>
     </div>
     <label for="hours">Количество часов</label>
@@ -232,9 +232,9 @@ input[type='time'] {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--color-light);
-  -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-  -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-  box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+  -webkit-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+  box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
@@ -246,9 +246,9 @@ input[type='time'] {
 .free-time-el:hover {
   border-radius: 2px;
   border: 1px solid blue;
-  -webkit-box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
-  -moz-box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
-  box-shadow: 5px 5px 9px 0px rgba(34, 60, 80, 0.2);
+  -webkit-box-shadow: 5px 5px 9px 0 rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 5px 5px 9px 0 rgba(34, 60, 80, 0.2);
+  box-shadow: 5px 5px 9px 0 rgba(34, 60, 80, 0.2);
 }
 
 button {
