@@ -7,6 +7,7 @@ const userInfo = useUserStore()
 const props = defineProps(['resourceId'])
 const workTime = ref([])
 const timeList = ref([])
+const existFreeTime = computed(() => workTime.value.length > 0);
 const isOrderValid = computed(() => orderTime.value !== "");
 const durationText = computed(() => getDurationText(Number(duration.value)))
 const maxDuration = computed(() => getMaxDuration(orderTime.value, workTime.value));
@@ -145,6 +146,9 @@ function order() {
     if (response.status === 401) {
       userInfo.login();
     }
+    if (response.status === 500) {
+      alert("Сервис временно не доступен!");
+    }
   })
     .catch((error) => {
       alert(error);
@@ -172,13 +176,13 @@ function order() {
     <div class="interval" v-for="interval in workTime" v-bind:key="interval.startTime">
       {{ interval.startTime }} - {{ interval.endTime }}
     </div>
-    <h3>Выбрать время</h3>
+    <h3>{{existFreeTime ? "Выбрать время" : "Нет свободного времени"}}</h3>
     <div class="free-time">
       <div class="free-time-el" v-for="el in timeList" :key="el"
            v-bind:class="orderTime === el ? 'selected' : ''"
            v-on:click="selectStartTime(el)">{{el}}</div>
     </div>
-    <label for="hours">Количество часов</label>
+    <label for="hours" v-if="existFreeTime">Количество часов</label>
     <input
       v-model="duration"
       type="range"
@@ -188,8 +192,9 @@ function order() {
       :max="maxDuration"
       step="0.5"
       value="1"
+      v-if="existFreeTime"
     />
-    <output class="price-output" for="hours">{{durationText}}</output>
+    <output v-if="existFreeTime" class="price-output" for="hours">{{durationText}}</output>
     <button v-on:click="order" v-if="isOrderValid">Забронировать</button>
   </div>
 </template>
