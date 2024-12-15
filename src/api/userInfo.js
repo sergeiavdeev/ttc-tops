@@ -1,10 +1,11 @@
 const api_host = import.meta.env.VITE_API_HOST;
+const cors = import.meta.env.VITE_API_CORS;
 
 export default {
   getUserInfo() {
     return fetch(api_host + '/user/info', {
       method: 'GET',
-      //mode: 'cors',
+      mode: cors,
       credentials: 'include'
     }).then(res => res.json())
   },
