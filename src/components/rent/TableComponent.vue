@@ -78,9 +78,9 @@ function cleanIntervals(intervals) {
   for (let i = 0; i < intervals.length; i++) {
     let startTime = getDate(intervals[i].startTime)
     let endTime = getDate(intervals[i].endTime)
-    let duration = (endTime.getHours() - startTime.getHours()) * 60 + endTime.getMinutes() - endTime.getMinutes()
+    let duration = (endTime.getHours() - startTime.getHours()) * 60 + endTime.getMinutes() - startTime.getMinutes()
     if (duration >= 60) {
-      result.push(intervals[i])
+      result.push(intervals[i]);
     }
   }
   return result;
