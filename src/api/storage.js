@@ -45,6 +45,31 @@ export default {
         endTime: endTime
       })
     });
+  },
 
+  getOrders() {
+    return fetch(`${api_host}/api/v1/order?admin=0`, {
+      method: 'GET',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest'
+      }
+    })
+      .then(res => res.json())
+      .catch(err => console.log(err));
+  },
+
+  getOrdersAdmin() {
+    return fetch(`${api_host}/api/v1/order?admin=1`, {
+      method: 'GET',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest'
+      }
+    })
+      .then(res => res.json())
+      .catch(err => console.log(err));
   }
 }
