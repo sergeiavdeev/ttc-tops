@@ -66,7 +66,8 @@ function getMaxDuration(orderTime, workTime) {
 function getWorkTime() {
   storage.getWorkTime(props.resourceId, orderDate.value)
     .then((res) => {
-      if (res.dateWorkTimeList.length > 0) {
+
+      if (res.dateWorkTimeList.length > 0 ) {
         let intervals = cleanIntervals(res.dateWorkTimeList[0].timeIntervals)
         workTime.value = intervals;
         generateTimeList(intervals)
@@ -97,7 +98,6 @@ function generateTimeList(intervals) {
     while (startTime < endTime) {
       if (startTime.getMinutes() === 0) {
         startTime.setMinutes(startTime.getMinutes() + 30)
-        //startTime = new Date(startTime);
       } else {
         startTime.setHours(startTime.getHours() + 1)
         startTime.setMinutes(0)

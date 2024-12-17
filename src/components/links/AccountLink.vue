@@ -26,7 +26,7 @@ function onClick() {
     </a>
     <div class="drop-down" v-if="isShowDropDown">
       <ul>
-        <li><RouterLink to="">Тренировки</RouterLink></li>
+        <li><RouterLink to="/orders">Тренировки</RouterLink></li>
         <li><RouterLink to="">Статистика</RouterLink></li>
         <li><a href="#" v-on:click="user.logout()">Выйти</a></li>
       </ul>
