@@ -3,12 +3,36 @@
 import { onMounted, ref } from 'vue'
 import storage from '@/api/storage.js'
 import OrderComponent from '@/components/rent/OrderComponent.vue'
+import { useUserStore } from '@/stores/user.js'
 
+const user = useUserStore();
 const orders = ref([]);
 
 onMounted(() => {
-  storage.getOrders()
-    .then(res => orders.value = res)
+  if (user.isAuthenticated) {
+    storage.getOrders()
+      .then(res => {
+        for(var i = 0; i < res.length; i++) {
+          res[i].createdAt = new Date(res[i].createdAt);
+          res[i].bookingDate = new Date(res[i].bookingDate);
+          res[i].duration = getDurationText(res[i].startTime, res[i].endTime);
+        }
+        orders.value = res;
+      });
+  } else {
+    user.login();
+  }
+
+  function getDurationText(startTime, endTime) {
+    var duration = "";
+    var start = startTime.split(':')[0] * 60 + Number(startTime.split(':')[1]);
+    var end = endTime.split(':')[0] * 60 + Number(endTime.split(':')[1]);
+    duration = (end - start) / 60;
+    if (duration === 1) {
+      return duration + " час"
+    }
+    return duration + " часа";
+  }
 })
 
 </script>
@@ -19,7 +43,7 @@ onMounted(() => {
     <div class="container">
       <div class="orders">
         <div class="order" v-for="order in orders" v-bind:key="order.id">
-          <h2>Заказ от: {{order.createdAt}}</h2>
+          <h2>Заказ от: {{order.createdAt.toLocaleString()}}</h2>
           <OrderComponent :order="order" />
         </div>
       </div>

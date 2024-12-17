@@ -1,12 +1,14 @@
 <script setup>
+
   const props = defineProps(['order'])
+
 </script>
 
 <template>
   <div class="order_content">
-    <div>Дата: {{props.order.bookingDate}}</div>
+    <div>Дата: {{props.order.bookingDate.toLocaleString().split(',')[0]}}</div>
     <div>Начало в: {{props.order.startTime}}</div>
-    <div>Продолжительность: {{props.order.endTime}}</div>
+    <div>Продолжительность: {{props.order.duration}}</div>
     <div>Статус: ожидает платы</div>
     <button>Отменить</button>
   </div>
