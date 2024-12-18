@@ -7,7 +7,8 @@ import { ref } from 'vue'
 const user = useUserStore()
 const isShowDropDown = ref(false)
 
-function onClick() {
+function onClick(event) {
+  event.preventDefault();
   if (user.isAuthenticated) {
     isShowDropDown.value = !isShowDropDown.value
   } else {
@@ -26,8 +27,15 @@ function onClick() {
     </a>
     <div class="drop-down" v-if="isShowDropDown">
       <ul>
-        <li><RouterLink to="/orders">Тренировки</RouterLink></li>
-        <li><RouterLink to="">Статистика</RouterLink></li>
+        <li><RouterLink to="/orders" v-on:click="isShowDropDown=false">Тренировки</RouterLink></li>
+        <li><RouterLink to="" v-on:click="isShowDropDown=false">Статистика</RouterLink></li>
+        <li>
+          <RouterLink to="/admin"
+            v-on:click="isShowDropDown=false"
+            v-if="user.hasRole('admin')"
+          >Администрирование
+          </RouterLink>
+        </li>
         <li><a href="#" v-on:click="user.logout()">Выйти</a></li>
       </ul>
     </div>

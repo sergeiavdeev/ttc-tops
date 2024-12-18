@@ -2,34 +2,38 @@
 import { computed, onMounted, ref } from 'vue'
 import storage from '@/api/storage.js'
 import { useUserStore } from '@/stores/user.js'
-//const listId = useId();
-const userInfo = useUserStore()
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
+const userInfo = useUserStore();
+
 const props = defineProps(['resourceId'])
 const workTime = ref([])
 const timeList = ref([])
-const existFreeTime = computed(() => workTime.value.length > 0);
+const existFreeTime = computed(() => workTime.value && workTime.value.length > 0);
 const isOrderValid = computed(() => orderTime.value !== "");
 const durationText = computed(() => getDurationText(Number(duration.value)))
 const maxDuration = computed(() => getMaxDuration(orderTime.value, workTime.value));
-const orderDate = defineModel('orderDate',{ default: new Date().toISOString().split('T')[0] })
+const orderDate = defineModel('orderDate',{ default: "" })
 const orderTime = defineModel('orderTime', { default: ""})
 const duration = defineModel('duration', {default: 1});
 const maxDate = (function () {
   let date = new Date()
   date.setDate(date.getDate() + 6)
-  return date.toISOString().split('T')[0]
+  return stringDate(date);
 })()
 const minDate = (function () {
   let date = new Date()
-  return date.toISOString().split('T')[0]
+  return stringDate(date);
 })()
 
 onMounted(() => {
-  getWorkTime()
+  orderDate.value = stringDate();
+  getWorkTime(stringDate())
 })
 
 function changeDate() {
-  getWorkTime()
+  getWorkTime(orderDate.value);
 }
 
 function getDurationText(duration) {
@@ -63,8 +67,8 @@ function getMaxDuration(orderTime, workTime) {
   return duration;
 }
 
-function getWorkTime() {
-  storage.getWorkTime(props.resourceId, orderDate.value)
+function getWorkTime(date) {
+  storage.getWorkTime(props.resourceId, date)
     .then((res) => {
 
       if (res.dateWorkTimeList.length > 0 ) {
@@ -117,6 +121,17 @@ function getDate(time) {
   return date
 }
 
+function stringDate(date) {
+
+  if (!date) {
+    date = new Date();
+  }
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1;
+  let day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+  return  year + '-' + month + '-' + day;
+}
+
 function selectStartTime(time) {
   if (orderTime.value === time) {
     orderTime.value = "";
@@ -141,7 +156,8 @@ function order() {
     if (response.ok) {
       console.log(response);
       getWorkTime();
-      alert("Бронирование успешно!")
+      router.push('/orders');
+      //alert("Бронирование успешно!");
     }
     if (response.status === 401) {
       userInfo.login();
