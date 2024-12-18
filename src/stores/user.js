@@ -19,6 +19,10 @@ export const useUserStore = defineStore('user', {
       this.isAuthenticated = this.info.uuid != null;
     },
 
+    hasRole(role) {
+      return this.info.roles.indexOf(role) !== -1;
+    },
+
     login() {
       userInfo.login();
     },

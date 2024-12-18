@@ -15,6 +15,9 @@ export const useStorageStore = defineStore('storage', {
       this.info = await storage.getInfo()
     },
 
+    getResource(id) {
+      return this.info.resources.find((item) => item.id === id);
+    }
     // async getFreeWorkTime(resourceId, date) {
     //   console.log('Storage:getFreeWorkTime');
     //   let result = await storage.getFreeWorkTime(resourceId, date);

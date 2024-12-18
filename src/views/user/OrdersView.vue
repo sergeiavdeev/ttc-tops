@@ -1,21 +1,24 @@
 <script setup>
 
 import { onMounted, ref } from 'vue'
-import storage from '@/api/storage.js'
+import api from '@/api/storage.js'
 import OrderComponent from '@/components/rent/OrderComponent.vue'
 import { useUserStore } from '@/stores/user.js'
+import { useStorageStore } from '@/stores/storage.js'
 
 const user = useUserStore();
+const storage = useStorageStore();
 const orders = ref([]);
 
 onMounted(() => {
   if (user.isAuthenticated) {
-    storage.getOrders()
+    api.getOrders()
       .then(res => {
         for(var i = 0; i < res.length; i++) {
           res[i].createdAt = new Date(res[i].createdAt);
           res[i].bookingDate = new Date(res[i].bookingDate);
           res[i].duration = getDurationText(res[i].startTime, res[i].endTime);
+          res[i].resource = storage.getResource(res[i].resourceId);
         }
         orders.value = res;
       });

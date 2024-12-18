@@ -6,10 +6,10 @@
 
 <template>
   <div class="order_content">
-    <div>Дата: {{props.order.bookingDate.toLocaleString().split(',')[0]}}</div>
-    <div>Начало в: {{props.order.startTime}}</div>
-    <div>Продолжительность: {{props.order.duration}}</div>
-    <div>Статус: ожидает платы</div>
+    <div><b>Дата:</b> {{props.order.bookingDate.toLocaleString().split(',')[0]}}</div>
+    <div><b>Аренда:</b> {{props.order.resource.name}} на {{props.order.duration}}</div>
+    <div><b>Начало в:</b> {{props.order.startTime}}</div>
+    <div><b>Статус:</b> ожидает платы</div>
     <button>Отменить</button>
   </div>
 </template>
