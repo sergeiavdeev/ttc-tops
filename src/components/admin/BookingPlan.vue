@@ -1,27 +1,59 @@
 <script setup>
+  import ContactLink from '@/components/links/ContactLink.vue'
+
   const props = defineProps(['resource'])
 </script>
 
 <template>
   <div class="resource-plan">
-    <h2>{{props.resource.name}}</h2>
-    <table v-for="date in props.resource.dates" :key="date">
-      <tr>
-        <th colspan="3">{{new Date(date.date).toLocaleString().split(',')[0]}}</th>
-      </tr>
-      <tr v-for="booking in date.bookings" :key="booking.startTime">
-        <td class="td-time">{{booking.startTime}} - {{booking.endTime}}</td>
-        <td class="td-name">{{booking.firstName}} {{booking.lastName}}</td>
-        <td class="td-mail"><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></td>
-      </tr>
+    <table>
+      <caption>{{props.resource.name}}</caption>
+      <thead>
+        <tr>
+          <th>Время</th>
+          <th>Имя</th>
+          <th>E-mail</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody v-for="date in props.resource.dates" :key="date">
+        <tr>
+          <td class="center-col" colspan="5">{{new Date(date.date).toLocaleString().split(',')[0]}}</td>
+        </tr>
+        <tr v-for="booking in date.bookings" :key="booking.startTime">
+          <td>{{booking.startTime}} - {{booking.endTime}}</td>
+          <td>{{booking.firstName}} {{booking.lastName}}</td>
+          <td><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></td>
+          <td class="cell-actions"><ContactLink img="accept"/></td>
+          <td class="cell-actions"><ContactLink img="cancel"/></td>
+        </tr>
+      </tbody>
+
     </table>
   </div>
 </template>
 
 <style scoped>
 .resource-plan {
-  max-width: 600px;
+  max-width: 700px;
 }
+
+.center-col {
+  text-align: center;
+  background-color: lightgrey;
+  color: var(--color-dark);
+}
+
+.cell-actions {
+
+  cursor: pointer;
+}
+
+.cell-actions:hover {
+  background-color: var(--color-dark);
+}
+
 table {
   font-size: 1.8rem;
   border-collapse: collapse;
@@ -37,23 +69,22 @@ table {
 
 th {
   text-align: center;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-dark);
+  background-color: var(--color-dark);
+  color: var(--color-white);
 }
 
 th, td {
-  padding: 5px
+  padding: 10px
 }
 
 td {
   text-align: left;
 }
 
-.td-time {
-  width: 13rem;
-}
-
-.td-mail {
-  width: 25rem;
+caption {
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 a {
