@@ -18,16 +18,5 @@ export const useStorageStore = defineStore('storage', {
     getResource(id) {
       return this.info.resources.find((item) => item.id === id);
     }
-    // async getFreeWorkTime(resourceId, date) {
-    //   console.log('Storage:getFreeWorkTime');
-    //   let result = await storage.getFreeWorkTime(resourceId, date);
-    //   result['resourceId'] = resourceId;
-    //   let i = this.workTime.findIndex(item => item.resorceId === resourceId);
-    //   if (i === -1) {
-    //     this.workTime.add(result);
-    //   } else {
-    //     this.workTime[i] = result;
-    //   }
-    // }
   },
 })
