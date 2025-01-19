@@ -5,7 +5,7 @@ export const useStorageStore = defineStore('storage', {
   state: () => ({
     info: {
       resources: [],
-      workTime: []
+      contacts: []
     },
   }),
   actions: {

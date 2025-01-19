@@ -71,5 +71,54 @@ export default {
     })
       .then(res => res.json())
       .catch(err => console.log(err));
+  },
+
+  getAmount(resourceId, count) {
+    let urlParams = new URLSearchParams({
+      resourceId: resourceId,
+      count: count
+    });
+    return fetch(`${api_host}/api/v1/order/price?` + urlParams, {
+      method: 'GET',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest'
+      }
+    })
+      .then(res => res.text())
+      .catch(err => console.log(err));
+  },
+
+  deleteOrder(id) {
+    return fetch(`${api_host}/api/v1/order`, {
+      method: 'DELETE',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest',
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        "id": id
+      })
+    })
+      .catch(err => console.log(err));
+  },
+
+  orderPay(orderId, sum) {
+    return fetch(`${api_host}/api/v1/order/pay`, {
+      method: 'POST',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderId: orderId,
+        kt: sum
+      })
+    });
   }
 }

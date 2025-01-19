@@ -1,7 +1,17 @@
 <script setup>
   import ContactLink from '@/components/links/ContactLink.vue'
+  import { useOrdersStore } from '@/stores/orders.js'
 
   const props = defineProps(['resource'])
+  const ordersStore = useOrdersStore();
+
+  function deleteOrder(id) {
+    ordersStore.deleteOrder(id);
+  }
+
+  function payOrder(id, sum) {
+    ordersStore.payOrder(id, sum);
+  }
 </script>
 
 <template>
@@ -13,20 +23,22 @@
           <th>Время</th>
           <th>Имя</th>
           <th>E-mail</th>
+          <th>К оплате</th>
           <th></th>
           <th></th>
         </tr>
       </thead>
       <tbody v-for="date in props.resource.dates" :key="date">
         <tr>
-          <td class="center-col" colspan="5">{{new Date(date.date).toLocaleString().split(',')[0]}}</td>
+          <td class="center-col" colspan="6">{{new Date(date.date).toLocaleString().split(',')[0]}}</td>
         </tr>
         <tr v-for="booking in date.bookings" :key="booking.startTime">
           <td>{{booking.startTime}} - {{booking.endTime}}</td>
           <td>{{booking.firstName}} {{booking.lastName}}</td>
           <td><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></td>
-          <td class="cell-actions"><ContactLink img="accept"/></td>
-          <td class="cell-actions"><ContactLink img="cancel"/></td>
+          <td class="right">{{booking.debt}}</td>
+          <td class="cell-actions"><ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0"/></td>
+          <td class="cell-actions"><ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/></td>
         </tr>
       </tbody>
 
@@ -93,5 +105,9 @@ a {
 
 a:hover {
   color: var(--color-light);
+}
+
+.right {
+  text-align: right;
 }
 </style>
