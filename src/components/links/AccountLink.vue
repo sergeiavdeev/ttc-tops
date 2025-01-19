@@ -27,8 +27,8 @@ function onClick(event) {
     </a>
     <div class="drop-down" v-if="isShowDropDown">
       <ul>
-        <li><RouterLink to="/orders" v-on:click="isShowDropDown=false">Тренировки</RouterLink></li>
-        <li><RouterLink to="" v-on:click="isShowDropDown=false">Статистика</RouterLink></li>
+        <li><RouterLink to="/orders" v-on:click="isShowDropDown=false">Заказы</RouterLink></li>
+        <!--<li><RouterLink to="" v-on:click="isShowDropDown=false">Статистика</RouterLink></li> -->
         <li>
           <RouterLink to="/admin"
             v-on:click="isShowDropDown=false"

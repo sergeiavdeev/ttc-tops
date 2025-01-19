@@ -11,12 +11,13 @@ const props = defineProps(['resourceId'])
 const workTime = ref([])
 const timeList = ref([])
 const existFreeTime = computed(() => workTime.value && workTime.value.length > 0);
-const isOrderValid = computed(() => orderTime.value !== "");
+const isOrderValid = computed(() => orderTime.value !== "" && amount.value > 0);
 const durationText = computed(() => getDurationText(Number(duration.value)))
 const maxDuration = computed(() => getMaxDuration(orderTime.value, workTime.value));
 const orderDate = defineModel('orderDate',{ default: "" })
 const orderTime = defineModel('orderTime', { default: ""})
 const duration = defineModel('duration', {default: 1});
+const amount = defineModel('amount', {default: 0.0});
 const maxDate = (function () {
   let date = new Date()
   date.setDate(date.getDate() + 6)
@@ -29,11 +30,16 @@ const minDate = (function () {
 
 onMounted(() => {
   orderDate.value = stringDate();
-  getWorkTime(stringDate())
+  getWorkTime(stringDate());
+  getAmount();
 })
 
 function changeDate() {
   getWorkTime(orderDate.value);
+}
+
+function onChangeDuration() {
+  getAmount();
 }
 
 function getDurationText(duration) {
@@ -77,6 +83,17 @@ function getWorkTime(date) {
         generateTimeList(intervals)
       }
   })
+}
+
+function getAmount() {
+  storage.getAmount(props.resourceId, duration.value)
+    .then((res) => {
+      let sum = parseFloat(res);
+      if(isNaN(sum)) {
+        sum = 0
+      }
+      amount.value = sum;
+    });
 }
 
 function cleanIntervals(intervals) {
@@ -127,7 +144,7 @@ function stringDate(date) {
     date = new Date();
   }
   let year = date.getFullYear();
-  let month = date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1;
+  let month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
   let day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
   return  year + '-' + month + '-' + day;
 }
@@ -154,10 +171,7 @@ function order() {
   storage.createOrder(props.resourceId, orderDate.value, orderTime.value, endDate.toLocaleTimeString().substring(0, 5))
   .then((response) => {
     if (response.ok) {
-      console.log(response);
-      getWorkTime();
       router.push('/orders');
-      //alert("Бронирование успешно!");
     }
     if (response.status === 401) {
       userInfo.login();
@@ -209,8 +223,9 @@ function order() {
       step="0.5"
       value="1"
       v-if="existFreeTime"
+      v-on:change="onChangeDuration"
     />
-    <output v-if="existFreeTime" class="price-output" for="hours">{{durationText}}</output>
+    <output v-if="existFreeTime" class="price-output" for="hours">{{durationText}} - {{amount}} руб.</output>
     <button v-on:click="order" v-if="isOrderValid">Забронировать</button>
   </div>
 </template>
