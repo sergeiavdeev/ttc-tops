@@ -1,19 +1,23 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted} from 'vue'
 import storage from '@/api/storage.js'
 import { useUserStore } from '@/stores/user.js'
 import { useRouter } from 'vue-router'
+import { useStorageStore } from '@/stores/storage.js'
+import commons from '@/api/commons.js'
+import { storeToRefs } from 'pinia'
+import { useRulesStore } from '@/stores/rules.js'
 
 const router = useRouter();
 const userInfo = useUserStore();
+const storageStore = useStorageStore();
+const rulesStore = useRulesStore();
+
+const { getWorkTimesByResourceId, getTimeList, existFreeTime, getMaxDuration } = storeToRefs(storageStore);
 
 const props = defineProps(['resourceId'])
-const workTime = ref([])
-const timeList = ref([])
-const existFreeTime = computed(() => workTime.value && workTime.value.length > 0);
-const isOrderValid = computed(() => orderTime.value !== "" && amount.value > 0);
+//const isOrderValid = computed(() => orderTime.value !== "" && amount.value > 0)
 const durationText = computed(() => getDurationText(Number(duration.value)))
-const maxDuration = computed(() => getMaxDuration(orderTime.value, workTime.value));
 const orderDate = defineModel('orderDate',{ default: "" })
 const orderTime = defineModel('orderTime', { default: ""})
 const duration = defineModel('duration', {default: 1});
@@ -21,21 +25,28 @@ const amount = defineModel('amount', {default: 0.0});
 const maxDate = (function () {
   let date = new Date()
   date.setDate(date.getDate() + 6)
-  return stringDate(date);
-})()
+  return commons.dateToString(date);
+})();
 const minDate = (function () {
   let date = new Date()
-  return stringDate(date);
-})()
+  return commons.dateToString(date);
+})();
+
+const isOrderValid = computed(() => {
+  let bookingByDayOfWeek = rulesStore.getBookingByDayOfWeek(props.resourceId, userInfo.mainRole, new Date(orderDate.value).getDay());
+  let bookingToday = rulesStore.getBookingToday(props.resourceId, userInfo.mainRole, orderDate.value);
+  return (bookingByDayOfWeek || bookingToday) && orderTime.value !== "" && amount.value > 0;
+})
 
 onMounted(() => {
-  orderDate.value = stringDate();
-  getWorkTime(stringDate());
+  let stringDate = commons.dateToString();
+  orderDate.value = stringDate;
+  storageStore.loadWorkTime(props.resourceId, stringDate);
   getAmount();
 })
 
 function changeDate() {
-  getWorkTime(orderDate.value);
+  storageStore.loadWorkTime(props.resourceId, orderDate.value);
 }
 
 function onChangeDuration() {
@@ -60,31 +71,6 @@ function getDurationText(duration) {
   return text;
 }
 
-function getMaxDuration(orderTime, workTime) {
-  let duration = 2;
-  let startTimeMinutes = orderTime.split(":")[0] * 60 + Number(orderTime.split(":")[1]);
-  for (let i = 0; i < workTime.length; i++) {
-    let endTimeMinutes = workTime[i].endTime.split(":")[0] * 60 + Number(workTime[i].endTime.split(":")[1]);
-    if(endTimeMinutes - startTimeMinutes > 0 && endTimeMinutes - startTimeMinutes < 120) {
-      duration = (endTimeMinutes - startTimeMinutes) / 60;
-      break;
-    }
-  }
-  return duration;
-}
-
-function getWorkTime(date) {
-  storage.getWorkTime(props.resourceId, date)
-    .then((res) => {
-
-      if (res.dateWorkTimeList.length > 0 ) {
-        let intervals = cleanIntervals(res.dateWorkTimeList[0].timeIntervals)
-        workTime.value = intervals;
-        generateTimeList(intervals)
-      }
-  })
-}
-
 function getAmount() {
   storage.getAmount(props.resourceId, duration.value)
     .then((res) => {
@@ -94,59 +80,6 @@ function getAmount() {
       }
       amount.value = sum;
     });
-}
-
-function cleanIntervals(intervals) {
-  let result = [];
-  for (let i = 0; i < intervals.length; i++) {
-    let startTime = getDate(intervals[i].startTime)
-    let endTime = getDate(intervals[i].endTime)
-    let duration = (endTime.getHours() - startTime.getHours()) * 60 + endTime.getMinutes() - startTime.getMinutes()
-    if (duration >= 60) {
-      result.push(intervals[i]);
-    }
-  }
-  return result;
-}
-
-function generateTimeList(intervals) {
-  let list = []
-  for (let i = 0; i < intervals.length; i++) {
-    let startTime = getDate(intervals[i].startTime)
-    let endTime = getDate(intervals[i].endTime)
-    endTime.setHours(endTime.getHours() - 1)
-    list.push(intervals[i].startTime)
-    while (startTime < endTime) {
-      if (startTime.getMinutes() === 0) {
-        startTime.setMinutes(startTime.getMinutes() + 30)
-      } else {
-        startTime.setHours(startTime.getHours() + 1)
-        startTime.setMinutes(0)
-      }
-      list.push((startTime.getHours() < 10 ? "0" + startTime.getHours() : startTime.getHours()) + ':' +
-        (startTime.getMinutes() === 0 ? "00" : startTime.getMinutes())
-      )
-    }
-  }
-  timeList.value = list
-}
-
-function getDate(time) {
-  let date = new Date()
-  date.setHours(time.split(':')[0])
-  date.setMinutes(time.split(':')[1])
-  return date
-}
-
-function stringDate(date) {
-
-  if (!date) {
-    date = new Date();
-  }
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-  let day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-  return  year + '-' + month + '-' + day;
 }
 
 function selectStartTime(time) {
@@ -163,8 +96,8 @@ function keyDown(event) {
 
 function order() {
 
-  let startDate = getDate(orderTime.value);
-  let endDate = getDate(orderTime.value);
+  let startDate = commons.getDate(orderTime.value);
+  let endDate = commons.getDate(orderTime.value);
 
   endDate.setMinutes(startDate.getMinutes() + duration.value * 60);
 
@@ -186,6 +119,7 @@ function order() {
 
   orderTime.value = "";
 }
+
 </script>
 
 <template>
@@ -203,29 +137,29 @@ function order() {
         v-on:keydown="keyDown"
       />
     </label>
-    <div class="interval" v-for="interval in workTime" v-bind:key="interval.startTime">
+    <div class="interval" v-for="interval in getWorkTimesByResourceId(props.resourceId, orderDate)" v-bind:key="interval.startTime">
       {{ interval.startTime }} - {{ interval.endTime }}
     </div>
-    <h3>{{existFreeTime ? "Выбрать время" : "Нет свободного времени"}}</h3>
+    <h3>{{existFreeTime(props.resourceId, orderDate) ? "Выбрать время" : "Нет свободного времени"}}</h3>
     <div class="free-time">
-      <div class="free-time-el" v-for="el in timeList" :key="el"
+      <div class="free-time-el" v-for="el in getTimeList(props.resourceId, orderDate)" :key="el"
            v-bind:class="orderTime === el ? 'selected' : ''"
            v-on:click="selectStartTime(el)">{{el}}</div>
     </div>
-    <label for="hours" v-if="existFreeTime">Количество часов</label>
+    <label for="hours" v-if="existFreeTime(props.resourceId, orderDate)">Количество часов</label>
     <input
       v-model="duration"
       type="range"
       name="hours"
       id="hours"
       min="1"
-      :max="maxDuration"
+      :max="getMaxDuration(props.resourceId, orderDate, orderTime)"
       step="0.5"
       value="1"
-      v-if="existFreeTime"
+      v-if="existFreeTime(props.resourceId, orderDate)"
       v-on:change="onChangeDuration"
     />
-    <output v-if="existFreeTime" class="price-output" for="hours">{{durationText}} - {{amount}} руб.</output>
+    <output v-if="existFreeTime(props.resourceId, orderDate)" class="price-output" for="hours">{{durationText}} - {{amount}} руб.</output>
     <button v-on:click="order" v-if="isOrderValid">Забронировать</button>
   </div>
 </template>
