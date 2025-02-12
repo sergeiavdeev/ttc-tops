@@ -12,15 +12,30 @@ export const useUserStore = defineStore('user', {
     },
     isAuthenticated: false,
   }),
+  getters: {
+    hasRole: (state) => {
+      return (role) => state.info.roles.indexOf(role) !== -1;
+    },
+    roles: (state) => state.info.roles,
+    mainRole: (state) => {
+      if (state.info.roles.includes('admin')) {
+        return "admin";
+      } else if (state.info.roles.includes('owner')) {
+        return "owner";
+      } else if (state.info.roles.includes('user')) {
+        return "user";
+      }
+      return null;
+    }
+  },
   actions: {
     async getUser() {
       let user = await userInfo.getUserInfo();
       this.info = { ...this.info, ...user }
       this.isAuthenticated = this.info.uuid != null;
-    },
-
-    hasRole(role) {
-      return this.info.roles.indexOf(role) !== -1;
+      if (!this.info.roles) {
+        this.info.roles = [];
+      }
     },
 
     login() {
@@ -29,6 +44,6 @@ export const useUserStore = defineStore('user', {
 
     logout() {
       userInfo.logout();
-    }
+    },
   }
 })
