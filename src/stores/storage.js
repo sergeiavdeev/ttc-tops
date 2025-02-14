@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import storage from '@/api/storage.js'
 import commons from '@/api/commons.js'
 
+const HOUR = 60 * 60 * 1000;
+const MINUTE = 60 * 1000;
+
 export const useStorageStore = defineStore('storage', {
   state: () => ({
     info: {
@@ -48,21 +51,17 @@ export const useStorageStore = defineStore('storage', {
     },
 
     getTimeList: (state) => {
-      return (resourceId, date) => {
+      return (resourceId, date, count) => {
         let list = [];
         let intervals = state.getWorkTimesByResourceId(resourceId, date);
         for (let i = 0; i < intervals.length; i++) {
           let startTime = commons.getDate(intervals[i].startTime)
           let endTime = commons.getDate(intervals[i].endTime)
-          endTime.setHours(endTime.getHours() - 1)
+          //endTime.setHours(endTime.getHours() - count)
+          endTime.setTime(endTime.getTime() - count * HOUR);
           list.push(intervals[i].startTime)
           while (startTime < endTime) {
-            if (startTime.getMinutes() === 0) {
-              startTime.setMinutes(startTime.getMinutes() + 30)
-            } else {
-              startTime.setHours(startTime.getHours() + 1)
-              startTime.setMinutes(0)
-            }
+            startTime.setTime(startTime.getTime() + 30 * MINUTE);
             list.push((startTime.getHours() < 10 ? "0" + startTime.getHours() : startTime.getHours()) + ':' +
               (startTime.getMinutes() === 0 ? "00" : startTime.getMinutes())
             )

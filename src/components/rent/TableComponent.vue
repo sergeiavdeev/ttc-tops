@@ -16,7 +16,6 @@ const rulesStore = useRulesStore();
 const { getWorkTimesByResourceId, getTimeList, existFreeTime, getMaxDuration } = storeToRefs(storageStore);
 
 const props = defineProps(['resourceId'])
-//const isOrderValid = computed(() => orderTime.value !== "" && amount.value > 0)
 const durationText = computed(() => getDurationText(Number(duration.value)))
 const orderDate = defineModel('orderDate',{ default: "" })
 const orderTime = defineModel('orderTime', { default: ""})
@@ -24,7 +23,7 @@ const duration = defineModel('duration', {default: 1});
 const amount = defineModel('amount', {default: 0.0});
 const maxDate = (function () {
   let date = new Date()
-  date.setDate(date.getDate() + 6)
+  date.setDate(date.getDate() + 14);
   return commons.dateToString(date);
 })();
 const minDate = (function () {
@@ -142,7 +141,7 @@ function order() {
     </div>
     <h3>{{existFreeTime(props.resourceId, orderDate) ? "Выбрать время" : "Нет свободного времени"}}</h3>
     <div class="free-time">
-      <div class="free-time-el" v-for="el in getTimeList(props.resourceId, orderDate)" :key="el"
+      <div class="free-time-el" v-for="el in getTimeList(props.resourceId, orderDate, duration)" :key="el"
            v-bind:class="orderTime === el ? 'selected' : ''"
            v-on:click="selectStartTime(el)">{{el}}</div>
     </div>
