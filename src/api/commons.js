@@ -10,6 +10,12 @@ export default {
     return  year + '-' + month + '-' + day;
   },
 
+  timeToString(date) {
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
+  },
+
   getDate(time) {
     let date = new Date()
     date.setHours(time.split(':')[0])

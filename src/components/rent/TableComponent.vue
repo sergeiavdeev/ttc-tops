@@ -100,7 +100,7 @@ function order() {
 
   endDate.setMinutes(startDate.getMinutes() + duration.value * 60);
 
-  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, endDate.toLocaleTimeString().substring(0, 5))
+  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
   .then((response) => {
     if (response.ok) {
       router.push('/orders');
