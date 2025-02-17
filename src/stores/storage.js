@@ -8,7 +8,8 @@ const MINUTE = 60 * 1000;
 export const useStorageStore = defineStore('storage', {
   state: () => ({
     info: {
-      resources: [{id: "", workTimes: []}, {id: "", workTimes: []}],
+      //resources: [{id: "", workTimes: []}, {id: "", workTimes: []}],
+      resources: [],
       contacts: [],
     },
   }),
