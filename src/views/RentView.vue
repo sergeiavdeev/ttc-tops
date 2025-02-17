@@ -40,13 +40,13 @@ h2 {
 }
 
 .rent-resource {
-  max-width: 450px;
+  max-width: 500px;
   display: flex;
   align-items: center;
   flex-direction: column;
   border: 1px solid var(--color-light);
   border-radius: 10px;
-  padding: 30px;
+  padding-bottom: 30px;
   -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
   -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
   box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
