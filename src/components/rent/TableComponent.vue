@@ -107,9 +107,12 @@ function saveSettings() {
 function loadSettings() {
   let settings = JSON.parse(localStorage.getItem(props.resourceId));
   if (settings) {
-    orderDate.value = settings.orderDate;
+    let savingDate = new Date(settings.orderDate);
+    if (savingDate > new Date()) {
+      orderDate.value = settings.orderDate;
+    }
     duration.value = settings.duration;
-    orderTime.value = settings.orderTime;
+    orderTime.value = "";
   }
 }
 
