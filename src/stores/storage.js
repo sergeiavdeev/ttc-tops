@@ -98,6 +98,9 @@ export const useStorageStore = defineStore('storage', {
 
     async loadWorkTime(resourceId, date) {
       let resource = this.info.resources.find((resource) => resource.id === resourceId);
+      if (!resource) {
+        return;
+      }
       if (!resource.workTimes) {
         resource.workTimes = [];
       }
