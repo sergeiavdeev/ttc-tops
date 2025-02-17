@@ -126,8 +126,6 @@ export const useStorageStore = defineStore('storage', {
         if (!workTime) {
           resource.workTimes.push(workTimes.dateWorkTimeList[0]);
         } else {
-          //resource.workTimes = resource.workTimes.filter((wt) => wt.date !== date);
-          //resource.workTimes.push(workTimes.dateWorkTimeList[0]);
           Object.assign(workTime, workTimes.dateWorkTimeList[0]);
         }
       }

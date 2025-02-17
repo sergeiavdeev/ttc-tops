@@ -2,17 +2,16 @@
 import TopNav from '@/components/TopNav.vue'
 import Footer from '@/components/FooterComponent.vue'
 import { useUserStore } from '@/stores/user.js'
-import { onMounted, watch } from 'vue'
+import { onMounted} from 'vue'
 import { useStorageStore } from '@/stores/storage.js'
 import * as rsocket from '@/api/rsocket.js'
 import { encodeCompositeMetadata, encodeRoute, MESSAGE_RSOCKET_ROUTING } from 'rsocket-core'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useOrdersStore } from '@/stores/orders.js'
 
 const user = useUserStore();
 const storage = useStorageStore();
 const orderStore = useOrdersStore();
-const route = useRoute();
 const router = useRouter();
 
 onMounted(() => {
@@ -38,7 +37,7 @@ function rSocketStreamHandler() {
       stream.subscribe({
         onNext(payload) {
           console.log("Receive event: " + JSON.stringify(payload));
-          handleEvent(route.name, payload.data);
+          handleEvent(payload.data);
         },
         onError(e) {
           console.log("Error: " + e);
@@ -54,7 +53,7 @@ function rSocketStreamHandler() {
     });
 }
 
-function handleEvent(currentRoute, event) {
+function handleEvent(event) {
 
   if (event.type === "BookingCreated" || event.type === "BookingCanceled") {
     let resourceId = event.data.resourceId;
