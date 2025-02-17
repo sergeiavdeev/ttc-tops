@@ -40,9 +40,9 @@ const isOrderValid = computed(() => {
 onMounted(() => {
   let stringDate = commons.dateToString();
   orderDate.value = stringDate;
+  loadSettings();
   storageStore.loadWorkTime(props.resourceId, stringDate);
   getAmount();
-  loadSettings();
 })
 
 function changeDate() {
@@ -106,9 +106,11 @@ function saveSettings() {
 
 function loadSettings() {
   let settings = JSON.parse(localStorage.getItem(props.resourceId));
-  orderDate.value = settings.orderDate;
-  duration.value = settings.duration;
-  orderTime.value = settings.orderTime;
+  if (settings) {
+    orderDate.value = settings.orderDate;
+    duration.value = settings.duration;
+    orderTime.value = settings.orderTime;
+  }
 }
 
 function keyDown(event) {
