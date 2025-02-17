@@ -42,14 +42,17 @@ onMounted(() => {
   orderDate.value = stringDate;
   storageStore.loadWorkTime(props.resourceId, stringDate);
   getAmount();
+  loadSettings();
 })
 
 function changeDate() {
   storageStore.loadWorkTime(props.resourceId, orderDate.value);
+  saveSettings();
 }
 
 function onChangeDuration() {
   getAmount();
+  saveSettings();
 }
 
 function getDurationText(duration) {
@@ -87,6 +90,25 @@ function selectStartTime(time) {
   } else {
     orderTime.value = time;
   }
+  saveSettings();
+}
+
+function saveSettings() {
+  localStorage.setItem(props.resourceId,
+    JSON.stringify({
+        orderTime: orderTime.value,
+        duration: duration.value,
+        orderDate: orderDate.value
+      }
+    )
+  );
+}
+
+function loadSettings() {
+  let settings = JSON.parse(localStorage.getItem(props.resourceId));
+  orderDate.value = settings.orderDate;
+  duration.value = settings.duration;
+  orderTime.value = settings.orderTime;
 }
 
 function keyDown(event) {
@@ -100,17 +122,28 @@ function order() {
 
   endDate.setMinutes(startDate.getMinutes() + duration.value * 60);
 
-  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
+  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, "9:00")
+  //storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
   .then((response) => {
     if (response.ok) {
       router.push('/orders');
     }
-    if (response.status === 401) {
-      userInfo.login();
+    else {
+      if (response.status === 401) {
+        userInfo.login();
+      }
+      if (response.status === 500) {
+        response.text().then((text) => {
+          alert(text);
+        })
+      }
+      if (response.status === 400) {
+        response.json().then((json) => {
+          alert(JSON.stringify(json));
+        })
+      }
     }
-    if (response.status === 500) {
-      alert("Сервис временно не доступен!");
-    }
+
   })
     .catch((error) => {
       alert(error);
