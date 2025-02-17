@@ -41,7 +41,7 @@ onMounted(() => {
   let stringDate = commons.dateToString();
   orderDate.value = stringDate;
   loadSettings();
-  //storageStore.loadWorkTime(props.resourceId, orderDate.value);
+  storageStore.loadWorkTime(props.resourceId, orderDate.value);
   getAmount();
 })
 
