@@ -41,7 +41,7 @@ onMounted(() => {
   let stringDate = commons.dateToString();
   orderDate.value = stringDate;
   loadSettings();
-  storageStore.loadWorkTime(props.resourceId, orderDate.value);
+  //storageStore.loadWorkTime(props.resourceId, orderDate.value);
   getAmount();
 })
 
@@ -124,8 +124,8 @@ function order() {
 
   endDate.setMinutes(startDate.getMinutes() + duration.value * 60);
 
-  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, "9:00")
-  //storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
+  //storage.createOrder(props.resourceId, orderDate.value, orderTime.value, "9:00")
+  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
   .then((response) => {
     if (response.ok) {
       router.push('/orders');
