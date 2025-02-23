@@ -43,7 +43,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  localStorage.setItem("lastRoute", to.path);
+  if (to.path !== "/") {
+    localStorage.setItem("lastRoute", to.path);
+  } else {
+    localStorage.removeItem("lastRoute");
+  }
+
 })
 
 export default router

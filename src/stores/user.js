@@ -8,42 +8,42 @@ export const useUserStore = defineStore('user', {
       firstName: '',
       lastName: '',
       email: '',
-      roles: []
+      roles: [],
     },
     isAuthenticated: false,
   }),
   getters: {
     hasRole: (state) => {
-      return (role) => state.info.roles.indexOf(role) !== -1;
+      return (role) => state.info.roles.indexOf(role) !== -1
     },
     roles: (state) => state.info.roles,
     mainRole: (state) => {
       if (state.info.roles.includes('admin')) {
-        return "admin";
+        return 'admin'
       } else if (state.info.roles.includes('owner')) {
-        return "owner";
+        return 'owner'
       } else if (state.info.roles.includes('user')) {
-        return "user";
+        return 'user'
       }
-      return null;
-    }
+      return null
+    },
   },
   actions: {
     async getUser() {
-      let user = await userInfo.getUserInfo();
+      let user = await userInfo.getUserInfo()
       this.info = { ...this.info, ...user }
-      this.isAuthenticated = this.info.uuid != null;
+      this.isAuthenticated = this.info.uuid != null
       if (!this.info.roles) {
-        this.info.roles = [];
+        this.info.roles = []
       }
     },
 
     login() {
-      userInfo.login();
+      userInfo.login()
     },
 
     logout() {
-      userInfo.logout();
+      userInfo.logout()
     },
-  }
+  },
 })
