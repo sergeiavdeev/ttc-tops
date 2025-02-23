@@ -2,7 +2,7 @@
 import TopNav from '@/components/TopNav.vue'
 import Footer from '@/components/FooterComponent.vue'
 import { useUserStore } from '@/stores/user.js'
-import { onMounted} from 'vue'
+import { onBeforeMount, onMounted } from 'vue'
 import { useStorageStore } from '@/stores/storage.js'
 import * as rsocket from '@/api/rsocket.js'
 import { encodeCompositeMetadata, encodeRoute, MESSAGE_RSOCKET_ROUTING } from 'rsocket-core'
@@ -14,13 +14,18 @@ const storage = useStorageStore();
 const orderStore = useOrdersStore();
 const router = useRouter();
 
-onMounted(() => {
+onBeforeMount(() => {
   user.getUser();
   storage.getInfo();
-  rSocketStreamHandler();
+})
 
+
+
+onMounted(() => {
+
+  rSocketStreamHandler();
   let lastRoute = localStorage.getItem('lastRoute');
-  if (lastRoute) {
+  if (lastRoute && window.location.pathname === "/") {
     router.push(lastRoute);
   }
 })

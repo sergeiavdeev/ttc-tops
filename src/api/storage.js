@@ -119,6 +119,7 @@ export default {
         orderId: orderId,
         kt: sum
       })
-    });
+    })
+      .catch(err => console.log(err));
   }
 }
