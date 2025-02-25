@@ -16,11 +16,12 @@
 
 <template>
   <div class="resource-plan">
+    <!--
     <table>
       <caption>{{props.resource.name}}</caption>
       <thead>
         <tr>
-          <th>Время</th>
+          <th colspan="2">Время</th>
           <th>Имя</th>
           <th>E-mail</th>
           <th>К оплате</th>
@@ -30,10 +31,11 @@
       </thead>
       <tbody v-for="date in props.resource.dates" :key="date">
         <tr>
-          <td class="center-col" colspan="6">{{new Date(date.date).toLocaleString().split(',')[0]}}</td>
+          <td class="center-col" colspan="7">{{new Date(date.date).toLocaleString().split(',')[0]}}</td>
         </tr>
         <tr v-for="booking in date.bookings" :key="booking.startTime">
-          <td>{{booking.startTime}} - {{booking.endTime}}</td>
+          <td>{{booking.startTime}}</td>
+          <td>{{booking.endTime}}</td>
           <td>{{booking.firstName}} {{booking.lastName}}</td>
           <td><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></td>
           <td class="right">{{booking.debt}}</td>
@@ -41,15 +43,61 @@
           <td class="cell-actions"><ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/></td>
         </tr>
       </tbody>
-
     </table>
+    -->
+
+    <h2>{{resource.name}}</h2>
+    <div class="plan-grid">
+      <div v-for="date in resource.dates" :key="date">
+        <h3>{{date.date}}</h3>
+        <div v-for="booking in date.bookings" :key="booking.startTime" class="booking-row">
+          <div class="time-interval">{{booking.startTime}} - {{booking.endTime}}</div>
+          <div>{{booking.firstName}} {{booking.lastName}}</div>
+          <div><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></div>
+          <!--<div>{{booking.debt}}</div>-->
+          <div><ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0"/></div>
+          <div><ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <style scoped>
 .resource-plan {
-  max-width: 700px;
+  max-width: 650px;
 }
+h3 {
+  background-color: var(--color-light);
+  color: white;
+  padding: 10px 0 10px 0;
+}
+
+.booking-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  font-size: 1.8rem;
+  padding: 10px 0 10px 0;
+}
+
+.plan-grid {
+  display: grid;
+  border-radius: 5px;
+  border: 1px solid var(--color-light);
+  -webkit-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+  box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+}
+
+.time-interval {
+  min-width: 11rem;
+}
+
 
 .center-col {
   text-align: center;
@@ -58,7 +106,6 @@
 }
 
 .cell-actions {
-
   cursor: pointer;
 }
 
@@ -98,6 +145,7 @@ caption {
   font-size: 2.5rem;
   font-weight: 700;
 }
+
 
 a {
   color: var(--color-dark);

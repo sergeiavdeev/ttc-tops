@@ -29,7 +29,7 @@ onUnmounted(() => {
     <div class="container">
       <div class="admin">
         <div class="resource-table" v-for="resource in getOrdersAll" v-bind:key="resource.id">
-          <BookingPlan :resource="resource" />
+          <BookingPlan :resource="resource" v-if="resource.dates.length > 0"/>
         </div>
       </div>
     </div>
@@ -49,5 +49,11 @@ h3 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
+  padding-bottom: 20px;
+}
+
+.resource-table {
+  display: flex;
+
 }
 </style>
