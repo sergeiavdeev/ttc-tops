@@ -51,12 +51,14 @@
       <div v-for="date in resource.dates" :key="date">
         <h3>{{date.date}}</h3>
         <div v-for="booking in date.bookings" :key="booking.startTime" class="booking-row">
-          <div class="time-interval">{{booking.startTime}} - {{booking.endTime}}</div>
-          <div>{{booking.firstName}} {{booking.lastName}}</div>
-          <div><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></div>
-          <!--<div>{{booking.debt}}</div>-->
-          <div><ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0"/></div>
-          <div><ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/></div>
+          <div>{{booking.startTime}} - {{booking.endTime}}</div>
+          <a v-bind:href="'mailto:' + booking.email">{{booking.firstName}} {{booking.lastName}}</a>
+          <!--<div><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></div>-->
+          <div>{{booking.debt}}</div>
+          <div class="grid-controls">
+            <ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0"/>
+            <ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/>
+          </div>
         </div>
       </div>
     </div>
@@ -75,11 +77,9 @@ h3 {
 }
 
 .booking-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 11rem 3fr 1fr 1fr;
+  align-items: center;
   gap: 2rem;
   font-size: 1.8rem;
   padding: 10px 0 10px 0;
@@ -92,6 +92,14 @@ h3 {
   -webkit-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
   -moz-box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
   box-shadow: 4px 4px 8px 0 rgba(34, 60, 80, 0.2);
+}
+
+.grid-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  min-height: 24px;
+  min-width: 96px;
 }
 
 .time-interval {
@@ -155,7 +163,5 @@ a:hover {
   color: var(--color-light);
 }
 
-.right {
-  text-align: right;
-}
+
 </style>

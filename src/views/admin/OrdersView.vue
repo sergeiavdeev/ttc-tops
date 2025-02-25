@@ -14,7 +14,7 @@ onMounted(() => {
   orderStore.loadOrdersAdmin();
   timer = setInterval(() => {
     orderStore.loadOrdersAdmin();
-  }, 60000)
+  }, 60000 * 60)
 })
 
 onUnmounted(() => {
