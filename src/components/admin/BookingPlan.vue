@@ -48,7 +48,7 @@ h3 {
 
 .booking-row {
   display: grid;
-  grid-template-columns: 11rem 3fr 1fr 1fr;
+  grid-template-columns: 12rem 3fr 1fr 1fr;
   align-items: center;
   gap: 2rem;
   font-size: 1.8rem;
