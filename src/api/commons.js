@@ -34,5 +34,7 @@ export default {
     return duration + ' часа'
   },
 
-
+  formatDate(strDate) {
+    return new Date(strDate).toLocaleDateString("ru", {day: 'numeric', month: 'long', year: 'numeric'})
+  }
 }
