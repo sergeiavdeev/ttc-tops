@@ -60,7 +60,9 @@ export const useStorageStore = defineStore('storage', {
           let endTime = commons.getDate(intervals[i].endTime)
           //endTime.setHours(endTime.getHours() - count)
           endTime.setTime(endTime.getTime() - count * HOUR);
-          list.push(intervals[i].startTime)
+          if (startTime <= endTime) {
+            list.push(intervals[i].startTime);
+          }
           while (startTime < endTime) {
             startTime.setTime(startTime.getTime() + 30 * MINUTE);
             list.push((startTime.getHours() < 10 ? "0" + startTime.getHours() : startTime.getHours()) + ':' +
