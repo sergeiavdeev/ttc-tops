@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import storage from '@/api/storage.js'
+import storageApi from '@/api/storage.js'
 import commons from '@/api/commons.js'
 
 const HOUR = 60 * 60 * 1000;
@@ -8,20 +8,38 @@ const MINUTE = 60 * 1000;
 export const useStorageStore = defineStore('storage', {
   state: () => ({
     info: {
+      id: "",
+      owner: "",
+      name: "",
+      address: "",
       //resources: [{id: "", workTimes: []}, {id: "", workTimes: []}],
       resources: [],
       contacts: [],
+      calendars: []
     },
+    loading: false,
+    isError: false,
+    error: {
+      httpStatus: 0,
+      message: "",
+      stackTrace: ""
+    },
+    doUpdate: {
+      order: false,
+      workTime: false,
+    }
   }),
   getters: {
 
+    getInfo: (state) => state.info,
+    getContacts: (state) => state.info.contacts,
     getResource: (state) => {
       return (resourceId) => state.info.resources.find((resource) => resource.id === resourceId);
     },
 
-    getResources: (state) => {
-      return () => state.info.resources;
-    },
+    getResources: (state) => state.info.resources,
+
+    getCalendars: (state) => state.info.calendars,
 
     getWorkTimesByResourceId: (state) => {
       return (resourceId, date) => {
@@ -94,9 +112,23 @@ export const useStorageStore = defineStore('storage', {
     }
   },
   actions: {
-    async getInfo() {
-      console.log('Storage:getInfo')
-      this.info = await storage.getInfo();
+    async loadInfo() {
+      this.loading = true;
+      let res = await storageApi.getInfo();
+      this.loading = false;
+      this.isError = res.isError;
+      if (!res.isError) {
+        this.info = res.data;
+        res = await storageApi.getCalendars();
+        this.isError = res.isError;
+        if (!res.isError) {
+          this.info.calendars = res.data;
+        } else {
+          this.error = res.data;
+        }
+      } else {
+        this.error = res.data;
+      }
     },
 
     async loadWorkTime(resourceId, date) {
@@ -109,10 +141,19 @@ export const useStorageStore = defineStore('storage', {
       }
       let workTime = resource.workTimes.find((wt) => wt.date === date);
       if (!workTime) {
-        let workTimes = await storage.getWorkTime(resource.id, date);
-        if (workTimes.dateWorkTimeList && workTimes.dateWorkTimeList.length > 0) {
-          workTime = workTimes.dateWorkTimeList[0];
-          resource.workTimes.push(workTime);
+        this.loading = true;
+        let res = await storageApi.getWorkTime(resource.id, date);
+        this.loading = false;
+        let workTimes;
+        this.isError = res.isError;
+        if (!res.isError) {
+          workTimes = res.data;
+          if (workTimes.dateWorkTimeList && workTimes.dateWorkTimeList.length > 0) {
+            workTime = workTimes.dateWorkTimeList[0];
+            resource.workTimes.push(workTime);
+          }
+        } else {
+          this.error = res.data;
         }
       }
     },
@@ -122,15 +163,27 @@ export const useStorageStore = defineStore('storage', {
       if (!resource.workTimes) {
         resource.workTimes = [];
       }
-      let workTimes = await storage.getWorkTime(resource.id, date);
-      let workTime = resource.workTimes.find((wt) => wt.date === date);
-      if (workTimes.dateWorkTimeList && workTimes.dateWorkTimeList.length > 0) {
-        if (!workTime) {
-          resource.workTimes.push(workTimes.dateWorkTimeList[0]);
-        } else {
-          Object.assign(workTime, workTimes.dateWorkTimeList[0]);
+      let workTimes;
+      this.loading = true;
+      let res= await storageApi.getWorkTime(resource.id, date);
+      this.loading = false;
+      if (!res.isError) {
+        workTimes = res.data;
+        let workTime = resource.workTimes.find((wt) => wt.date === date);
+        if (workTimes.dateWorkTimeList && workTimes.dateWorkTimeList.length > 0) {
+          if (!workTime) {
+            resource.workTimes.push(workTimes.dateWorkTimeList[0]);
+          } else {
+            Object.assign(workTime, workTimes.dateWorkTimeList[0]);
+          }
         }
+      } else {
+        this.error = res.data;
       }
+    },
+
+    setDoUpdate(doUpdate) {
+      this.doUpdate = doUpdate;
     }
   },
 })

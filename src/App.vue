@@ -7,19 +7,15 @@ import { useStorageStore } from '@/stores/storage.js'
 import * as rsocket from '@/api/rsocket.js'
 import { encodeCompositeMetadata, encodeRoute, MESSAGE_RSOCKET_ROUTING } from 'rsocket-core'
 import { useRouter } from 'vue-router'
-import { useOrdersStore } from '@/stores/orders.js'
 
 const user = useUserStore();
 const storage = useStorageStore();
-const orderStore = useOrdersStore();
 const router = useRouter();
 
 onBeforeMount(() => {
   user.getUser();
-  storage.getInfo();
+  storage.loadInfo();
 })
-
-
 
 onMounted(() => {
 
@@ -45,7 +41,7 @@ function rSocketStreamHandler() {
           handleEvent(payload.data);
         },
         onError(e) {
-          console.log("Error: " + e);
+          console.log("ErrorComponent: " + e);
         },
         onComplete() {
           console.log("Completed");
@@ -66,16 +62,24 @@ function handleEvent(event) {
     storage.updateWorkTime(resourceId, date);
 
     if (user.hasRole("admin") || user.hasRole("owner")) {
-      orderStore.loadOrdersAdmin();
+      storage.setDoUpdate({
+        order: true,
+        workTime: false,
+      });
     }
     if (user.hasRole("user")) {
-      orderStore.loadOrders();
+      storage.setDoUpdate({
+        order: true,
+        workTime: false,
+      });
     }
   }
   if (event.type === "OrderPayed" && user.hasRole("user")) {
-    orderStore.loadOrders();
+    storage.setDoUpdate({
+      order: true,
+      workTime: false,
+    });
   }
-
   console.log("Event: " + event.type + " handled");
 }
 

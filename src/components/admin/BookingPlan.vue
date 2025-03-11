@@ -1,44 +1,71 @@
 <script setup>
   import ContactLink from '@/components/links/ContactLink.vue'
-  import { useOrdersStore } from '@/stores/orders.js'
-  import commons from '../../api/commons.js'
+   import commons from '../../api/commons.js'
+  import bookingApi from '@/api/booking.js'
+  import orderApi from '@/api/order.js'
+  import { ref } from 'vue'
+  import LoadingView from '@/components/LoadingView.vue'
+  import ErrorComponent from '@/components/ErrorComponent.vue'
 
-  const props = defineProps(['resource'])
-  const ordersStore = useOrdersStore();
+  defineProps(['resource', 'bookings']);
+  const emit = defineEmits(['deleteBooking', 'orderPay']);
 
-  function deleteOrder(id) {
-    ordersStore.deleteOrder(id);
+  const loading = ref(false);
+  const isError = ref(false);
+  const error = ref({});
+
+  async function deleteOrder(id) {
+    loading.value = true;
+    let result = await bookingApi.deleteBooking(id);
+    loading.value = false;
+    isError.value = result.isError;
+    if (result.isError) {
+      error.value = result.data;
+    } else {
+      emit('deleteBooking', id);
+    }
   }
 
-  function payOrder(id, sum) {
-    ordersStore.payOrder(id, sum);
+  async function payOrder(id, sum) {
+    loading.value = true;
+    let result = await orderApi.orderPay(id, sum);
+    loading.value = false;
+    isError.value = result.isError;
+    if (result.isError) {
+      error.value = result.data;
+    } else {
+      emit('orderPay', id, sum);
+    }
   }
+
 </script>
 
 <template>
-  <div class="resource-plan">
+  <div class="resource-plan" v-if="bookings.length > 0">
     <h2>{{resource.name}}</h2>
     <div class="plan-grid">
-      <div v-for="date in props.resource.dates" :key="date">
-        <h3>{{commons.formatDate(date.date)}}</h3>
-        <div v-for="booking in date.bookings" :key="booking.startTime" class="booking-row">
+      <div v-for="date in new Set(bookings.map(booking => booking.bookingDate))" :key="date">
+        <h3>{{commons.formatDate(date)}}</h3>
+        <div v-for="booking in bookings.filter(booking => booking.bookingDate === date)" :key="booking.startTime" class="booking-row">
           <div>{{booking.startTime}} - {{booking.endTime}}</div>
-          <a v-bind:href="'mailto:' + booking.email">{{booking.firstName}} {{booking.lastName}}</a>
+          <a v-bind:href="'mailto:' + booking.user.email">{{booking.user.firstName}} {{booking.user.lastName}}</a>
           <!--<div><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></div>-->
-          <div>{{booking.debt}}</div>
+          <div class="align-end">{{booking.debt}}</div>
           <div class="grid-controls">
-            <ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0"/>
-            <ContactLink img="cancel" v-on:click="deleteOrder(booking.id)"/>
+            <ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0 && !loading"/>
+            <ContactLink img="cancel" v-on:click="deleteOrder(booking.id)" v-if="!loading"/>
           </div>
         </div>
       </div>
     </div>
+    <LoadingView v-if="loading"/>
+    <ErrorComponent v-if="isError" :error="error" @closeError="isError=false"/>
   </div>
 </template>
 
 <style scoped>
 .resource-plan {
-  max-width: 650px;
+  max-width: 600px;
 }
 h3 {
   background-color: var(--color-light);
@@ -52,7 +79,7 @@ h3 {
   align-items: center;
   gap: 2rem;
   font-size: 1.8rem;
-  padding: 10px 0 10px 0;
+  padding: 10px 0 10px 5px;
 }
 
 .plan-grid {
@@ -66,10 +93,15 @@ h3 {
 
 .grid-controls {
   display: flex;
+  gap: 1rem;
   flex-direction: row;
   justify-content: end;
   min-height: 24px;
   min-width: 96px;
+}
+
+.align-end {
+  text-align: end;
 }
 
 a {

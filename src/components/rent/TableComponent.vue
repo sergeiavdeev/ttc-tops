@@ -1,19 +1,23 @@
 <script setup>
-import { computed, onMounted} from 'vue'
-import storage from '@/api/storage.js'
+import { computed, onMounted, ref } from 'vue'
+import orderApi from '@/api/order.js'
+import bookingApi from '@/api/booking.js'
 import { useUserStore } from '@/stores/user.js'
 import { useRouter } from 'vue-router'
 import { useStorageStore } from '@/stores/storage.js'
 import commons from '@/api/commons.js'
 import { storeToRefs } from 'pinia'
 import { useRulesStore } from '@/stores/rules.js'
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import LoadingView from '@/components/LoadingView.vue'
+import CollapseLink from '@/components/links/CollapseLink.vue'
 
 const router = useRouter();
 const userInfo = useUserStore();
 const storageStore = useStorageStore();
 const rulesStore = useRulesStore();
 
-const { getWorkTimesByResourceId, getTimeList, existFreeTime, getMaxDuration } = storeToRefs(storageStore);
+const { getWorkTimesByResourceId, getTimeList, existFreeTime, getMaxDuration, getResource } = storeToRefs(storageStore);
 
 const props = defineProps(['resourceId'])
 const durationText = computed(() => getDurationText(Number(duration.value)))
@@ -37,9 +41,13 @@ const isOrderValid = computed(() => {
   return (bookingByDayOfWeek || bookingToday) && orderTime.value !== "" && amount.value > 0;
 })
 
+const loading = ref(false);
+const isError = ref(false);
+const error = ref({});
+const collapsed = ref(false);
+
 onMounted(() => {
-  let stringDate = commons.dateToString();
-  orderDate.value = stringDate;
+  orderDate.value = commons.dateToString();
   loadSettings();
   storageStore.loadWorkTime(props.resourceId, orderDate.value);
   getAmount();
@@ -73,15 +81,18 @@ function getDurationText(duration) {
   return text;
 }
 
-function getAmount() {
-  storage.getAmount(props.resourceId, duration.value)
-    .then((res) => {
-      let sum = parseFloat(res);
-      if(isNaN(sum)) {
-        sum = 0
-      }
-      amount.value = sum;
-    });
+async function getAmount() {
+  let res = await orderApi.getAmount(props.resourceId, duration.value);
+  if (!res.isError) {
+    let data = res.data;
+    let sum = data.sum;
+    if (data.condition.sum) {
+      sum = data.condition.sum;
+    }
+    amount.value = sum;
+  } else {
+    amount.value = 0;
+  }
 }
 
 function selectStartTime(time) {
@@ -120,104 +131,111 @@ function keyDown(event) {
   event.preventDefault()
 }
 
-function order() {
+async function bookingCreate() {
 
   let startDate = commons.getDate(orderTime.value);
   let endDate = commons.getDate(orderTime.value);
 
   endDate.setMinutes(startDate.getMinutes() + duration.value * 60);
 
-  //storage.createOrder(props.resourceId, orderDate.value, orderTime.value, "9:00")
-  storage.createOrder(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate))
-  .then((response) => {
-    if (response.ok) {
-      router.push('/orders');
-    }
-    else {
-      if (response.status === 401) {
-        userInfo.login();
-      }
-      if (response.status === 500) {
-        response.text().then((text) => {
-          alert(text);
-        })
-      }
-      if (response.status === 400) {
-        response.json().then((json) => {
-          alert(JSON.stringify(json));
-        })
-      }
-    }
-
-  })
-    .catch((error) => {
-      alert(error);
-    });
-
-  orderTime.value = "";
+  loading.value = true;
+  let result = await bookingApi.createBooking(props.resourceId, orderDate.value, orderTime.value, commons.timeToString(endDate));
+  loading.value = false;
+  isError.value = result.isError;
+  if (result.isError) {
+    error.value = result.data;
+  } else {
+    await router.push('/orders');
+  }
 }
-
 </script>
 
 <template>
-  <div class="table-container">
-    <label for="rentDate"
-      >Свободное время на:
+  <div class="form-group flex-column flex-center">
+    <div class="form-group-header">
+      <CollapseLink :caption="`${getResource(props.resourceId).name} (${getResource(props.resourceId).description})`" v-bind:collapsed="collapsed" @collapse="collapsed = !collapsed"/>
+    </div>
+    <div :class="collapsed ? 'hidden' : 'visible'">
+      <!--<h2>{{getResource(props.resourceId).name}} ({{getResource(props.resourceId).description}})</h2> -->
+      <label for="rentDate"
+        >Дата:
+        <input
+          v-model="orderDate"
+          type="date"
+          id="rentDate"
+          value="2024-01-01"
+          :min="minDate"
+          :max="maxDate"
+          v-on:change="changeDate"
+          v-on:keydown="keyDown"
+        />
+      </label>
+      <!--
+      <div
+        class="interval"
+        v-for="interval in getWorkTimesByResourceId(props.resourceId, orderDate)"
+        v-bind:key="interval.startTime"
+      >
+        {{ interval.startTime }} - {{ interval.endTime }}
+      </div>
+      -->
+      <label for="hours" v-if="existFreeTime(props.resourceId, orderDate)">Количество часов</label>
       <input
-        v-model="orderDate"
-        type="date"
-        id="rentDate"
-        value="2024-01-01"
-        :min="minDate"
-        :max="maxDate"
-        v-on:change="changeDate"
-        v-on:keydown="keyDown"
+        v-model="duration"
+        type="range"
+        name="hours"
+        id="hours"
+        min="1"
+        :max="getMaxDuration(props.resourceId, orderDate, orderTime)"
+        step="0.5"
+        value="1"
+        v-if="existFreeTime(props.resourceId, orderDate)"
+        v-on:change="onChangeDuration"
       />
-    </label>
-    <div class="interval" v-for="interval in getWorkTimesByResourceId(props.resourceId, orderDate)" v-bind:key="interval.startTime">
-      {{ interval.startTime }} - {{ interval.endTime }}
+      <output v-if="existFreeTime(props.resourceId, orderDate)" class="price-output" for="hours">
+        {{ durationText }} - {{ amount }} руб.
+      </output>
+      <h3>
+        {{ existFreeTime(props.resourceId, orderDate) ? 'Выбрать время' : 'Нет свободного времени' }}
+      </h3>
+      <div class="free-time">
+        <div
+          class="free-time-el"
+          v-for="el in getTimeList(props.resourceId, orderDate, duration)"
+          :key="el"
+          v-bind:class="orderTime === el ? 'selected' : ''"
+          v-on:click="selectStartTime(el)"
+        >
+          {{ el }}
+        </div>
+      </div>
+      <button v-on:click="bookingCreate" :disabled="loading || !isOrderValid">Забронировать</button>
     </div>
-    <h3>{{existFreeTime(props.resourceId, orderDate) ? "Выбрать время" : "Нет свободного времени"}}</h3>
-    <div class="free-time">
-      <div class="free-time-el" v-for="el in getTimeList(props.resourceId, orderDate, duration)" :key="el"
-           v-bind:class="orderTime === el ? 'selected' : ''"
-           v-on:click="selectStartTime(el)">{{el}}</div>
-    </div>
-    <label for="hours" v-if="existFreeTime(props.resourceId, orderDate)">Количество часов</label>
-    <input
-      v-model="duration"
-      type="range"
-      name="hours"
-      id="hours"
-      min="1"
-      :max="getMaxDuration(props.resourceId, orderDate, orderTime)"
-      step="0.5"
-      value="1"
-      v-if="existFreeTime(props.resourceId, orderDate)"
-      v-on:change="onChangeDuration"
-    />
-    <output v-if="existFreeTime(props.resourceId, orderDate)" class="price-output" for="hours">{{durationText}} - {{amount}} руб.</output>
-    <button v-on:click="order" v-if="isOrderValid">Забронировать</button>
+    <LoadingView v-if="loading"/>
+    <ErrorComponent v-if="isError" v-bind:error="error" @closeError="isError=false"/>
   </div>
 </template>
 
 <style scoped>
-.table-container {
-  display: flex;
-  flex-direction: column;
+
+h3 {
+  color: var(--color-light);
+}
+
+.flex-center {
   align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
 }
 
 label {
   font-size: 2rem;
   cursor: default;
-  margin: 0.5rem;
 }
 
 input[type='date'],
 input[type='time'] {
-  font-size: 2rem;
-  padding: 10px;
+  width: auto;
 }
 
 .interval {
@@ -231,7 +249,6 @@ input[type='time'] {
   justify-content: center;
   flex-wrap: wrap;
   gap: 2rem;
-  padding: 10px;
 }
 
 .free-time-el {
@@ -258,17 +275,8 @@ input[type='time'] {
   box-shadow: 5px 5px 9px 0 rgba(34, 60, 80, 0.2);
 }
 
-button {
-  font-size: 2rem;
-  padding: 15px;
-  border-radius: 5px;
-  background-color: var(--color-light);
-  color: var(--color-white);
-  transition: color 0.3s ease-in-out;
-  margin-top: 3rem;
+.price-output {
+  font-size: 1.5rem;
 }
 
-button:hover {
-  color: white;
-}
 </style>

@@ -14,6 +14,7 @@
 
     /* Size */
     --container-width: 1280px;
+    --footer-height: 4rem;
 }
 
 /* Reset */
@@ -149,6 +150,20 @@ a {
     }
 }
 
+input[type=text], input[type=tel], input[type=email], input[type=date] {
+    font-size: 2rem;
+    width: 100%;
+    border: none;
+    padding: 1rem 0;
+    color: var(--color-dark);
+    border-bottom: solid 1px var(--color-light);
+}
+
+label {
+    color: var(--color-light);
+    font-size: 1.5rem;
+}
+
 .container {
     padding: 0 10px;
     max-width: 1280px;
@@ -156,6 +171,23 @@ a {
     margin: 0 auto;
 }
 
+button {
+    font-size: 2rem;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: var(--color-light);
+    color: var(--color-white);
+    transition: color 0.3s ease-in-out;
+    margin-top: 3rem;
+}
+
+button:hover {
+    color: white;
+}
+
+button:disabled {
+    background-color: lightgray;
+}
 
 .link__account {
     display: flex;
@@ -167,8 +199,6 @@ a {
     padding-left: 5px;
 
 }
-
-
 
 .link__menu {
     display: flex;
@@ -221,6 +251,7 @@ a {
 
 section {
     padding-top: 70px;
+    padding-bottom: 5rem;
 }
 
 .last-item {
@@ -228,6 +259,43 @@ section {
     @media (max-width: 880px) {
         order: 0;
     }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    margin-top: 3rem;
+    border-radius: 3px;
+    border: 1px solid var(--color-light);
+    position: relative;
+    padding: 15px 15px 15px 15px;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.form-group-header {
+    font-size: 2rem;
+    position: absolute;
+    top: -12px;
+    left: 12px;
+    background-color: white;
+    padding: 0 5px 0 5px;
+}
+
+.visible {
+    display: contents;
+}
+
+.hidden {
+    display: none;
 }
 
 @media (max-width: 740px) {

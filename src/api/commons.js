@@ -1,4 +1,20 @@
+import userInfo from '@/api/userInfo.js'
+
 export default {
+
+  dayOfWeek(day) {
+    let days = [
+      "Понедельник",
+      "Вторник",
+      "Среда",
+      "Четверг",
+      "Пятница",
+      "Суббота",
+      "Воскресенье"
+    ]
+
+    return days[day - 1];
+  },
 
   dateToString(date) {
     if (!date) {
@@ -36,5 +52,39 @@ export default {
 
   formatDate(strDate) {
     return new Date(strDate).toLocaleDateString("ru", {day: 'numeric', month: 'long', year: 'numeric'})
+  },
+
+  handleHttpResponse(response, ignoreBody) {
+    let isError = !response.ok;
+    if (response.status === 401) {
+      userInfo.login();
+    }
+    if (ignoreBody) {
+      return {
+        isError: isError,
+        data: {
+          httpStatus: response.status,
+          message: "",
+          stacktrace: "",
+        }
+      }
+    }
+    return response.json().then(data => {
+      return {
+        isError: isError,
+        data: data
+      }
+    });
+  },
+
+  handleError(error) {
+    return {
+      isError: true,
+      data: {
+        httpStatus: 0,
+        message: error.message,
+        stacktrace: error.message,
+      }
+    }
   }
 }
