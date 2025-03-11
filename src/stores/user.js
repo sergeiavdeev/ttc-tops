@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import userInfo from '@/api/userInfo.js'
+import userApi from '@/api/userInfo.js'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async getUser() {
-      let user = await userInfo.getUserInfo()
+      let user = await userApi.getUserInfo()
       this.info = { ...this.info, ...user }
       this.isAuthenticated = this.info.uuid != null
       if (!this.info.roles) {
@@ -39,11 +39,11 @@ export const useUserStore = defineStore('user', {
     },
 
     login() {
-      userInfo.login()
+      userApi.login()
     },
 
     logout() {
-      userInfo.logout()
+      userApi.logout()
     },
   },
 })

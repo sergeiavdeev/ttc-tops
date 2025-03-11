@@ -1,8 +1,10 @@
 <script setup>
 import { useStorageStore } from '@/stores/storage.js'
 import TableComponent from '@/components/rent/TableComponent.vue'
+import LoadingView from '@/components/LoadingView.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 
-const storageInfo = useStorageStore();
+const storageStore = useStorageStore();
 
 </script>
 
@@ -11,13 +13,12 @@ const storageInfo = useStorageStore();
     <h1>Бронирование столов</h1>
     <div class="container">
       <div class="rent">
-        <div v-for="resource in storageInfo.info.resources" class="rent-resource" v-bind:key="resource.id">
-          <h2>
-            {{ resource.name }} ({{resource.description}})
-          </h2>
-          <TableComponent v-bind:resource-id=resource.id />
+        <div v-for="resource in storageStore.info.resources" v-bind:key="resource.id">
+          <TableComponent :resource-id=resource.id :collapse="false"/>
         </div>
       </div>
+      <LoadingView v-if="storageStore.loading"/>
+      <ErrorComponent v-if="storageStore.isError" v-bind:error="storageStore.error" @closeError="storageStore.isError = false" />
     </div>
   </section>
 </template>
@@ -25,32 +26,23 @@ const storageInfo = useStorageStore();
 <style scoped>
 h1 {
   color: var(--color-dark);
-}
-
-h2 {
-  padding: 30px;
+  padding: 1rem 0 0 0;
 }
 
 .rent {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-around;
-  gap: 30px;
+  gap: 2rem;
 }
 
-.rent-resource {
-  max-width: 500px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  border: 1px solid var(--color-light);
-  border-radius: 10px;
-  padding-bottom: 30px;
-  -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-  -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-  box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-  margin-bottom: 30px;
+@media (max-width: 800px) {
+  .rent {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 </style>
 

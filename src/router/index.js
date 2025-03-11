@@ -25,12 +25,22 @@ const router = createRouter({
     {
       path: '/orders',
       name: 'orders',
-      component: () => import('../views/user/OrdersView.vue'),
+      component: () => import('../views/user/BookingsView.vue'),
     },
     {
       path: '/admin',
-      name: 'admin',
-      component: () => import('../views/admin/OrdersView.vue'),
+      //name: 'admin',
+      component: () => import('../views/admin/AdminPanelView.vue'),
+      children: [
+        {
+          path: 'orders',
+          component: () => import('../views/admin/BookingsView.vue')
+        },
+        {
+          path: 'settings',
+          component: () => import('../views/admin/SettingsView.vue')
+        }
+      ]
     }
   ],
   scrollBehavior(to) {

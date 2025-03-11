@@ -30,7 +30,7 @@ function onClick(event) {
         <li><RouterLink to="/orders" v-on:click="isShowDropDown=false">Заказы</RouterLink></li>
         <!--<li><RouterLink to="" v-on:click="isShowDropDown=false">Статистика</RouterLink></li> -->
         <li>
-          <RouterLink to="/admin"
+          <RouterLink to="/admin/orders"
             v-on:click="isShowDropDown=false"
             v-if="user.hasRole('admin')"
           >Администрирование

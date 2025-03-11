@@ -14,8 +14,10 @@
   justify-content: center;
   align-items: center;
   background-color: var(--color-light);
-  height: 4rem;
+  height: var(--footer-height);
   width: 100%;
+  position: fixed;
+  bottom: 0;
 }
 
 .footer a {

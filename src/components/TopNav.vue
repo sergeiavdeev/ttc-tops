@@ -26,8 +26,6 @@ import AccountLink from '@/components/links/AccountLink.vue'
         </li>
       </ul>
       <AccountLink />
-      <!--<a class="link__account" v-if="!user.isAuthenticated" href="#" v-on:click="user.login()">Войти</a>
-      <a class="link__menu" v-if="user.isAuthenticated" href="#" v-on:click="user.login()">{{user.info.firstName}}</a> -->
     </nav>
   </header>
 </template>
