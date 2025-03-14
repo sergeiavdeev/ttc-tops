@@ -15,7 +15,8 @@ export const useStorageStore = defineStore('storage', {
       //resources: [{id: "", workTimes: []}, {id: "", workTimes: []}],
       resources: [],
       contacts: [],
-      calendars: []
+      calendars: [],
+      deviations: []
     },
     loading: false,
     isError: false,
@@ -33,6 +34,14 @@ export const useStorageStore = defineStore('storage', {
 
     getInfo: (state) => state.info,
     getContacts: (state) => state.info.contacts,
+    getDeviations: (state) => state.info.deviations.sort((a, b) => {
+      if (a.date > b.date) {
+        return 1;
+      } else if (a.date < b.date) {
+        return -1;
+      }
+      return 0;
+    }),
     getResource: (state) => {
       return (resourceId) => state.info.resources.find((resource) => resource.id === resourceId);
     },
@@ -118,11 +127,23 @@ export const useStorageStore = defineStore('storage', {
       this.loading = false;
       this.isError = res.isError;
       if (!res.isError) {
-        this.info = res.data;
+        this.info = {...this.info, ...res.data};
         res = await storageApi.getCalendars();
+        this.loading = false;
         this.isError = res.isError;
         if (!res.isError) {
           this.info.calendars = res.data;
+          if (res.data.length > 0) {
+            this.loading = true;
+            res = await storageApi.getDeviations(res.data[0].id);
+            this.loading = false;
+            this.isError = res.isError;
+            if (!res.isError) {
+              this.info.deviations = res.data;
+            } else {
+              this.error = res.data;
+            }
+          }
         } else {
           this.error = res.data;
         }
@@ -180,6 +201,14 @@ export const useStorageStore = defineStore('storage', {
       } else {
         this.error = res.data;
       }
+    },
+
+    addDeviation(deviation) {
+      this.info.deviations.push(deviation);
+    },
+
+    deleteDeviation(calendarId, date) {
+      this.info.deviations = this.info.deviations.filter(deviation => !(deviation.date === date && deviation.calendarId === calendarId));
     },
 
     setDoUpdate(doUpdate) {

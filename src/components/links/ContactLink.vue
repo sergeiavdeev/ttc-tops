@@ -1,6 +1,6 @@
 <script setup>
 
-const props = defineProps(['text', 'img', 'href'])
+const props = defineProps(['text', 'img', 'href', 'text'])
 
 </script>
 <template>

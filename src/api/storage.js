@@ -58,5 +58,38 @@ export default {
       body: JSON.stringify(info)
     }).then(response => commons.handleHttpResponse(response))
       .catch(err => commons.handleError(err));
+  },
+
+  getDeviations(calendarId) {
+    return fetch(`${api_host}/api/v1/calendar/${calendarId}/deviation`, {
+      method: 'GET',
+      credentials: 'omit',
+      mode: cors,
+      headers: headers
+    }).then(response => commons.handleHttpResponse(response))
+      .catch(err => commons.handleError(err));
+  },
+
+  saveDeviation(calendarId, deviation) {
+    return fetch(`${api_host}/api/v1/calendar/${calendarId}/deviation`, {
+      method: 'POST',
+      credentials: 'include',
+      mode: cors,
+      headers: headers,
+      body: JSON.stringify(deviation)
+    })
+    .then(response => commons.handleHttpResponse(response))
+    .catch(err => commons.handleError(err));
+  },
+
+  deleteDeviation(calendarId, date) {
+    return fetch(`${api_host}/api/v1/calendar/${calendarId}/deviation/${date}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      mode: cors,
+      headers: headers
+    })
+      .then(response => commons.handleHttpResponse(response, true))
+      .catch(err => commons.handleError(err));
   }
 }

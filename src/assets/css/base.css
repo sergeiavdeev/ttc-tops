@@ -150,7 +150,7 @@ a {
     }
 }
 
-input[type=text], input[type=tel], input[type=email], input[type=date] {
+input[type=text], input[type=tel], input[type=email], input[type=date], input[type=time] {
     font-size: 2rem;
     width: 100%;
     border: none;
