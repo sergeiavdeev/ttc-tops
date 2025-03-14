@@ -87,7 +87,7 @@ function save() {
 
 .schedules {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));;
   justify-items: center;
 }
 
