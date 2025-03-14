@@ -159,6 +159,13 @@ input[type=text], input[type=tel], input[type=email], input[type=date], input[ty
     border-bottom: solid 1px var(--color-light);
 }
 
+select {
+    font-size: 2rem;
+    padding: 1rem 0;
+    color: var(--color-dark);
+    border-bottom: solid 1px var(--color-light);
+}
+
 label {
     color: var(--color-light);
     font-size: 1.5rem;
