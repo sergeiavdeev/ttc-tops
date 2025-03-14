@@ -34,14 +34,17 @@ export const useStorageStore = defineStore('storage', {
 
     getInfo: (state) => state.info,
     getContacts: (state) => state.info.contacts,
-    getDeviations: (state) => state.info.deviations.sort((a, b) => {
-      if (a.date > b.date) {
-        return 1;
-      } else if (a.date < b.date) {
-        return -1;
-      }
-      return 0;
-    }),
+    getDeviations: (state) => {
+      return (calendarId) => state.info.deviations.filter(deviation => deviation.calendarId === calendarId)
+        .sort((a, b) => {
+          if (a.date > b.date) {
+            return 1;
+          } else if (a.date < b.date) {
+            return -1;
+          }
+          return 0;
+        });
+    },
     getResource: (state) => {
       return (resourceId) => state.info.resources.find((resource) => resource.id === resourceId);
     },

@@ -4,6 +4,10 @@
   import ResourceSettingsComponent from '@/components/admin/settings/ResourceSettingsComponent.vue'
   import ScheduleSettingsComponent from '@/components/admin/settings/ScheduleSettingsComponent.vue'
   import DeviationsSettingsComponent from '@/components/admin/settings/DeviationsSettingsComponent.vue'
+  import { useStorageStore } from '@/stores/storage.js'
+  import { storeToRefs } from 'pinia'
+
+  const { getCalendars } = storeToRefs(useStorageStore());
 </script>
 
 <template>
@@ -11,10 +15,10 @@
     <div class="settings">
       <StorageSettingsComponent :collapse="false"/>
       <div>
-        <ContactsSettingsComponent :collapse="false"/>
+        <ContactsSettingsComponent :collapse="true"/>
         <ResourceSettingsComponent :collapse="true"/>
         <ScheduleSettingsComponent :collapse="true"/>
-        <DeviationsSettingsComponent :collapse="true"/>
+        <DeviationsSettingsComponent :collapse="false" v-if="getCalendars.length > 0" :calendar="getCalendars[0].id"/>
       </div>
 
     </div>
