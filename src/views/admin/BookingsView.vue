@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingView from '@/components/LoadingView.vue'
 import booking from '@/api/booking.js'
+import ordersApi from '@/api/order.js'
 import { useStorageStore } from '@/stores/storage.js'
 
 const storage = useStorageStore();
@@ -25,13 +26,21 @@ onMounted(() => {
 
 async function loadBookings() {
   loading.value = true;
-  let result = await booking.getBookings(true)
+  let result = await booking.getBookingsAll(getResources.value.map(resource => resource.id));
   loading.value = false;
   isError.value = result.isError;
   if (result.isError) {
     error.value = result.data;
   } else {
-    bookings.value = result.data;
+    bookings.value = await Promise.all(result.data.map(booking => {
+      return ordersApi.getOrderByBookingId(booking.id)
+        .then(res => {
+          if (!res.isError) {
+            booking.order = res.data;
+          }
+          return booking;
+        });
+    }));
   }
 }
 

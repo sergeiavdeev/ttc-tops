@@ -49,6 +49,17 @@ export default {
       .catch(err => commons.handleError(err));
   },
 
+  addCalendar(calendar) {
+    return fetch(`${api_host}/api/v1/calendar`, {
+      method: 'POST',
+      credentials: 'include',
+      mode: cors,
+      headers: headers,
+      body: JSON.stringify(calendar)
+    }).then(response => commons.handleHttpResponse(response))
+      .catch(err => commons.handleError(err));
+  },
+
   updateInfo(info) {
     return fetch(`${api_host}/api/v1/storage`, {
       method: 'PATCH',

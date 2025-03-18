@@ -17,8 +17,8 @@
       <div>
         <ContactsSettingsComponent :collapse="true"/>
         <ResourceSettingsComponent :collapse="true"/>
-        <ScheduleSettingsComponent :collapse="true"/>
-        <DeviationsSettingsComponent :collapse="false" v-if="getCalendars.length > 0" :calendar="getCalendars[0].id"/>
+        <ScheduleSettingsComponent :collapse="false"/>
+        <DeviationsSettingsComponent :collapse="true" v-if="getCalendars.length > 0" :calendar="getCalendars[0].id"/>
       </div>
 
     </div>
