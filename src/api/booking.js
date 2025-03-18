@@ -64,4 +64,21 @@ export default {
       .then(respose => commons.handleHttpResponse(respose))
       .catch(err => commons.handleError(err));
   },
+
+  getBookingsAll(resourceIds) {
+    let urlParams = '?' + new URLSearchParams({
+      resources: resourceIds.join(',')
+    });
+
+    return fetch(`${api_host}/api/v1/order/all${urlParams}`, {
+      method: 'GET',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest'
+      }
+    })
+      .then(respose => commons.handleHttpResponse(respose))
+      .catch(err => commons.handleError(err));
+  }
 }

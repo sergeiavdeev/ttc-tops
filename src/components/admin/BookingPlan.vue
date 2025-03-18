@@ -26,7 +26,7 @@
     }
   }
 
-  async function payOrder(id, sum) {
+  async function payOrder(id, orderId, sum) {
     loading.value = true;
     let result = await orderApi.orderPay(id, sum);
     loading.value = false;
@@ -34,9 +34,26 @@
     if (result.isError) {
       error.value = result.data;
     } else {
-      emit('orderPay', id, sum);
+      loading.value = true;
+      result = await orderApi.orderPayV2(orderId, sum);
+      loading.value = false;
+      isError.value = result.isError;
+      if (result.isError) {
+        error.value = result.data;
+      } else {
+        emit('orderPay', id, sum);
+      }
     }
   }
+
+  /*
+  function debt(order) {
+    if (order && order.debts) {
+      return order.debts.reduce((total, debt) => total + (debt.dt - debt.kt), 0);
+    }
+    return 0;
+  }
+  */
 
 </script>
 
@@ -52,7 +69,7 @@
           <!--<div><a v-bind:href="'mailto:' + booking.email">{{booking.email}}</a></div>-->
           <div class="align-end">{{booking.debt}}</div>
           <div class="grid-controls">
-            <ContactLink img="accept" v-on:click="payOrder(booking.id, booking.debt)" v-if="booking.debt > 0 && !loading"/>
+            <ContactLink img="accept" v-on:click="payOrder(booking.id, booking.order.id, booking.debt)" v-if="booking.debt > 0 && !loading"/>
             <ContactLink img="cancel" v-on:click="deleteOrder(booking.id)" v-if="!loading"/>
           </div>
         </div>

@@ -40,5 +40,36 @@ export default {
     })
       .then(response => commons.handleHttpResponse(response, true))
       .catch(err => commons.handleError(err));
+  },
+
+  orderPayV2(orderId, sum) {
+    return fetch(`${api_host}/api/v2/order/pay`, {
+      method: 'POST',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderId: orderId,
+        kt: sum
+      })
+    })
+      .then(response => commons.handleHttpResponse(response, true))
+      .catch(err => commons.handleError(err));
+  },
+
+  getOrderByBookingId(bookingId) {
+    return fetch(`${api_host}/api/v2/order/${bookingId}`, {
+      method: 'GET',
+      credentials: 'include',
+      mode: cors,
+      headers: {
+        "X-Requested-With": 'XMLHttpRequest'
+      }
+    })
+      .then(response => commons.handleHttpResponse(response))
+      .catch(err => commons.handleError(err));
   }
 }
