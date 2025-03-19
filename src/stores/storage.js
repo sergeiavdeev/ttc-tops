@@ -131,6 +131,10 @@ export const useStorageStore = defineStore('storage', {
       this.isError = res.isError;
       if (!res.isError) {
         this.info = {...this.info, ...res.data};
+        this.doUpdate = {
+          order: true,
+          workTime: false
+        };
         res = await storageApi.getCalendars();
         this.loading = false;
         this.isError = res.isError;
