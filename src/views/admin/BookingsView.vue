@@ -25,6 +25,7 @@ onMounted(() => {
 })
 
 async function loadBookings() {
+  if (getResources.value.length === 0) return;
   loading.value = true;
   let result = await booking.getBookingsAll(getResources.value.map(resource => resource.id));
   loading.value = false;
